@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   ShuttleSchedule.init({
-    scheduleID: DataTypes.INTEGER,
+    scheduleID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true  
+    },
     departingLocation: DataTypes.STRING,
     departureTime: DataTypes.TIME
   }, {
