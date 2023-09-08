@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var grf = require('../models').GroupRegistrationForm;
-
+const authenticateToken = require('../middleware/authJWT');
 // CREATE: Add a new group registration
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     try {
         const groupRegistration = await grf.create(req.body);
         res.status(201).json(groupRegistration);
@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
 });
 
 // READ: Get a group registration by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const groupRegistration = await grf.findByPk(req.params.id);
         if (groupRegistration) {
@@ -27,7 +27,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // UPDATE: Update a group registration by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
     try {
         const [updated] = await grf.update(req.body, {
             where: { groupRegistrationID: req.params.id }
@@ -44,7 +44,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE: Delete a group registration by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         const deleted = await grf.destroy({
             where: { groupRegistrationID: req.params.id }
