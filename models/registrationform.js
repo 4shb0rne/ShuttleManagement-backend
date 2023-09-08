@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   RegistrationForm.init({
-    RegistrationID: DataTypes.INTEGER,
+    RegistrationID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true  
+    },
     binusianID: DataTypes.STRING,
     name: DataTypes.STRING,
     phoneNumber: DataTypes.STRING,

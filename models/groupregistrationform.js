@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   GroupRegistrationForm.init({
-    groupRegistrationID: DataTypes.INTEGER,
+    groupRegistrationID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true  
+    },
     divisionName: DataTypes.INTEGER,
     groupMembersName: DataTypes.STRING,
     status: DataTypes.STRING
