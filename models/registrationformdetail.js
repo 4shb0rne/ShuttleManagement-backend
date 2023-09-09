@@ -14,11 +14,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   RegistrationFormDetail.init({
-    scheduleID: DataTypes.INTEGER,
-    registrationID: DataTypes.INTEGER
+    scheduleID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
+    registrationID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    }
   }, {
     sequelize,
     modelName: 'RegistrationFormDetail',
+    autoIncrement: false, 
+    id: false
   });
   return RegistrationFormDetail;
 };

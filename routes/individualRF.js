@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var rf = require("../models").RegistrationForm;
-var rfd = require('../models').RegistrationFormDetail
+var rfd = require("../models").RegistrationFormDetail
 
 //ADD : Add Registration
 router.post("/add", async (req, res) => {
@@ -29,7 +29,7 @@ router.post("/add", async (req, res) => {
       const newRegistrationID = registration.RegistrationID;
       rfd.create({
         scheduleID,
-        newRegistrationID
+        registrationID: newRegistrationID
       });
       res.status(201).json({
         registration,
