@@ -12,6 +12,8 @@ var usersRouter = require("./routes/users");
 var scheduleRouter = require("./routes/schedule");
 var individualRF = require("./routes/individualRF");
 var groupRF = require("./routes/groupRF");
+var attendance = require('./routes/attendanceRoute');
+
 
 var app = express();
 
@@ -33,7 +35,7 @@ app.use("/users", usersRouter);
 app.use("/schedules", scheduleRouter);
 app.use("/registration", individualRF);
 app.use("/group-registration", groupRF);
-
+app.use("/attendance", attendance);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));

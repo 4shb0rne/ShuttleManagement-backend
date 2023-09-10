@@ -2,37 +2,32 @@
 const {
   Model
 } = require('sequelize');
+const { Sequelize } = require('.');
 module.exports = (sequelize, DataTypes) => {
-  class RegistrationForm extends Model {
+  class Attendance extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      this.hasMany(models.RegistrationFormDetail, {
+      this.belongsTo(models.RegistrationForm, {
         foreignKey: 'registrationID',
-        as: 'details' // This creates an alias for the relation for easier querying
+        onDelete: 'CASCADE' // this means if a RegistrationForm is deleted, its details are also deleted
       });
     }
   }
-  RegistrationForm.init({
-    RegistrationID: {
+  Attendance.init({
+    AttendanceID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true  
     },
-    binusianID: DataTypes.STRING,
-    name: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING,
-    email: DataTypes.STRING,
-    purpose: DataTypes.STRING,
-    useDate: DataTypes.DATE,
+    registrationID: DataTypes.INTEGER,
     status: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'RegistrationForm',
+    modelName: 'Attendance',
   });
-  return RegistrationForm;
+  return Attendance;
 };

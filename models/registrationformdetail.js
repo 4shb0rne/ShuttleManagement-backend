@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.RegistrationForm, {
+        foreignKey: 'registrationID',
+        onDelete: 'CASCADE' // this means if a RegistrationForm is deleted, its details are also deleted
+      });
     }
   }
   RegistrationFormDetail.init({

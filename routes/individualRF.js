@@ -43,14 +43,22 @@ router.post("/add", async (req, res) => {
 //GET : Get Registration Data by Schedule
 router.get("/schedule/:id", async (req, res) => {
   try {
-    const scheduleID = req.params.id;
-
+    const scheduleID = req.params.scheduleID;
+    const useDate = req.query.UseDate;
     const details = await RegistrationFormDetail.findAll({
       where: {
         scheduleID: scheduleID,
       },
+      include: [{
+        model: RegistrationForm,
+        as: 'RegistrationForm', 
+        where: {
+          useDate: {
+            [Op.eq]: useDate
+          }
+        }
+      }]
     });
-
     return res.status(200).json(details);
   } catch (err) {
     return res
