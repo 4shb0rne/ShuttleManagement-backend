@@ -19,7 +19,7 @@ router.post("/add", async (req, res) => {
         } = req.body;
 
         console.log(req.body);
-        console.log("ScheduleID2 = ", scheduleID2);
+        console.log("ScheduleID2 = ", scheduleID2); //this show
 
         const registration = await rf.create({
             binusianID,
@@ -31,12 +31,13 @@ router.post("/add", async (req, res) => {
             status,
         });
         const newRegistrationID = registration.RegistrationID;
-        rfd.create({
+        
+        await rfd.create({
             scheduleID,
             registrationID: newRegistrationID,
         });
-        rfd.create({
-            scheduleID2,
+        await rfd.create({
+            scheduleID: scheduleID2,
             registrationID: newRegistrationID,
         });
         res.status(201).json({
