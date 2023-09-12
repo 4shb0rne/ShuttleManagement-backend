@@ -18,9 +18,6 @@ router.post("/add", async (req, res) => {
             scheduleID2,
         } = req.body;
 
-        console.log(req.body);
-        console.log("ScheduleID2 = ", scheduleID2); //this show
-
         const registration = await rf.create({
             binusianID,
             name,
@@ -87,6 +84,21 @@ router.get("/:id", async (req, res) => {
         } else {
             res.status(404).json({ error: "Registration not found" });
         }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//PUT : update status absen
+router.put("/:id/status", async (req, res) => {
+    try {
+        const registration = await rf.findByPk(req.params.id);
+        if (!registration) {
+            return res.status(404).json({ error: "Registration not found" });
+        }
+        registration.status = req.body.status;
+        await registration.save();
+        res.json({ message: "Status updated successfully!", registration });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
