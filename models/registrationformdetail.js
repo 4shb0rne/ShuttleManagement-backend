@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class RegistrationFormDetail extends Model {
     /**
@@ -13,24 +11,34 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.RegistrationForm, {
         foreignKey: 'registrationID',
-        onDelete: 'CASCADE' // this means if a RegistrationForm is deleted, its details are also deleted
-      });
+        onDelete: 'CASCADE' // If a RegistrationForm is deleted, its details are also deleted
+    });
+    
+    // Association to ShuttleSchedule
+    this.belongsTo(models.ShuttleSchedule, {
+        foreignKey: 'scheduleID',
+        as: 'schedulesDetails',
+        onDelete: 'CASCADE' // If a ShuttleSchedule is deleted, its details are also deleted
+    });
     }
   }
-  RegistrationFormDetail.init({
-    scheduleID: {
-      type: DataTypes.INTEGER,
-      primaryKey: true
+  RegistrationFormDetail.init(
+    {
+      scheduleID: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+      },
+      registrationID: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+      },
     },
-    registrationID: {
-      type: DataTypes.INTEGER,
-      primaryKey: true
+    {
+      sequelize,
+      modelName: "RegistrationFormDetail",
+      autoIncrement: false,
+      id: false,
     }
-  }, {
-    sequelize,
-    modelName: 'RegistrationFormDetail',
-    autoIncrement: false, 
-    id: false
-  });
+  );
   return RegistrationFormDetail;
 };

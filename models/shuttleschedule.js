@@ -10,7 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.hasMany(models.RegistrationFormDetail, {
+        foreignKey: 'scheduleID',
+        as: 'schedulesDetails' // This creates an alias for the relation for easier querying
+    });
     }
   }
   ShuttleSchedule.init({

@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.RegistrationFormDetail, {
         foreignKey: 'registrationID',
         as: 'details' // This creates an alias for the relation for easier querying
-      });
+    });
     }
   }
   RegistrationForm.init({
