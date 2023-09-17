@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true  
     },
     departingLocation: DataTypes.STRING,
+    destinationLocation: DataTypes.STRING,
     departureTime: DataTypes.TIME
   }, {
     sequelize,

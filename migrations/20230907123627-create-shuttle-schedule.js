@@ -12,6 +12,9 @@ module.exports = {
       departingLocation: {
         type: Sequelize.STRING
       },
+      destinationLocation: {
+        type: Sequelize.STRING
+      },
       departureTime: {
         type: Sequelize.TIME
       },

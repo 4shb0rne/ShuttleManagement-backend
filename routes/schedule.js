@@ -13,7 +13,7 @@ router.get("/", async function (req, res, next) {
 });
 
 //get schedules based on departing location
-router.get("/get", async function (req, res, next) {
+router.get("/get-by-origin", async function (req, res, next) {
     try {
         const { origin } = req.query;
         if (!origin) {
@@ -24,6 +24,24 @@ router.get("/get", async function (req, res, next) {
         const schedules = await Shuttleschedule.findAll({
             where: {
                 departingLocation: origin,
+            },
+        });
+        res.json(schedules);
+    } catch (error) {
+        next(error);
+    }
+});
+router.get("/get-by-destination", async function (req, res, next) {
+    try {
+        const { destination } = req.query;
+        if (!destination) {
+            return res
+                .status(400)
+                .json({ error: "destination query parameter is required" });
+        }
+        const schedules = await Shuttleschedule.findAll({
+            where: {
+                destinationLocation : destination
             },
         });
         res.json(schedules);
