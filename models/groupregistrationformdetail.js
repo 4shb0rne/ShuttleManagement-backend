@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       // Association to ShuttleSchedule
       this.belongsTo(models.ShuttleSchedule, {
         foreignKey: "scheduleID",
-        as: "schedulesDetails",
+        as: "SchedulesDetails",
         onDelete: "CASCADE", // If a ShuttleSchedule is deleted, its details are also deleted
       });
     }

@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ShuttleSchedule extends Model {
     /**
@@ -11,23 +9,30 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.hasMany(models.RegistrationFormDetail, {
-        foreignKey: 'scheduleID',
-        as: 'schedulesDetails' // This creates an alias for the relation for easier querying
-    });
+        foreignKey: "scheduleID",
+        as: "schedulesDetails", // This creates an alias for the relation for easier querying
+      });
+      this.hasMany(models.GroupRegistrationFormDetail, {
+        foreignKey: "scheduleID",
+        as: "SchedulesDetails", // This creates an alias for the relation for easier querying
+      });
     }
   }
-  ShuttleSchedule.init({
-    scheduleID: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true  
+  ShuttleSchedule.init(
+    {
+      scheduleID: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      departingLocation: DataTypes.STRING,
+      destinationLocation: DataTypes.STRING,
+      departureTime: DataTypes.TIME,
     },
-    departingLocation: DataTypes.STRING,
-    destinationLocation: DataTypes.STRING,
-    departureTime: DataTypes.TIME
-  }, {
-    sequelize,
-    modelName: 'ShuttleSchedule',
-  });
+    {
+      sequelize,
+      modelName: "ShuttleSchedule",
+    }
+  );
   return ShuttleSchedule;
 };

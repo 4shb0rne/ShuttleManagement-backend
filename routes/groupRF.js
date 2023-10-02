@@ -3,7 +3,7 @@ var router = express.Router();
 var grf = require('../models').GroupRegistrationForm;
 var grfd = require('../models').GroupRegistrationFormDetail;
 var registrationform = require('./individualRF');
-
+var Shuttleschedule = require("../models").ShuttleSchedule;
 const authenticateToken = require('../middleware/authJWT');
 // CREATE: Add a new group registration
 router.post('/add', async (req, res) => {
@@ -62,7 +62,20 @@ router.post('/add', async (req, res) => {
 // READ: Get a group registration by ID
 router.get('/:id', async (req, res) => {
     try {
-        const groupRegistration = await grf.findByPk(req.params.id);
+        const groupRegistration = await grf.findByPk(req.params.id, {
+            include: [
+                {
+                    model: grfd,
+                    as: "details",
+                    include: [
+                        {
+                            model: Shuttleschedule,
+                            as: "SchedulesDetails", // This should match the alias in the ShuttleSchedule model's associations.
+                        },
+                    ],
+                },
+            ],
+        });
         if (groupRegistration) {
             res.json(groupRegistration);
         } else {

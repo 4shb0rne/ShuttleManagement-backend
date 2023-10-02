@@ -34,6 +34,39 @@ router.get("/schedule", async (req, res) => {
     }
 });
 
+
+router.get("/gets", async (req, res) => {
+    try {
+        const ids = req.query.ids.map(Number);
+        console.log(ids);
+        const registrations = await rf.findAll({
+            where: {
+                RegistrationID: {
+                    [Op.in]: ids
+                }
+            },
+            include: [
+                {
+                    model: rfd,
+                    as: "details",
+                    include: [
+                        {
+                            model: Shuttleschedule,
+                            as: "schedulesDetails"
+                        }
+                    ]
+                }
+            ]
+        });
+        
+        res.status(200).json(registrations);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 //GET : Get Registration Datas that have status 'waiting'
 router.get("/groupRequest", async (req, res) => {
     try {

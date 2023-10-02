@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.GroupRegistrationFormDetail, {
+        foreignKey: 'groupRegistrationID',
+        as: 'details' // This creates an alias for the relation for easier querying
+    });
     }
   }
   GroupRegistrationForm.init({
