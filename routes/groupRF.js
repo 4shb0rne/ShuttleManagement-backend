@@ -1,19 +1,66 @@
 var express = require('express');
 var router = express.Router();
 var grf = require('../models').GroupRegistrationForm;
+var grfd = require('../models').GroupRegistrationFormDetail;
+var registrationform = require('./individualRF');
+
 const authenticateToken = require('../middleware/authJWT');
 // CREATE: Add a new group registration
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/add', async (req, res) => {
+    const {
+        forms,
+        phoneNumber,
+        email,
+        purpose,
+        useDate,
+        status,
+        scheduleID,
+        scheduleID2,
+    } = req.body;
+
     try {
-        const groupRegistration = await grf.create(req.body);
-        res.status(201).json(groupRegistration);
+        const ids = await Promise.all(forms.map(async form => {
+            const { binusianID, name } = form;
+            const data = {
+                binusianID,
+                name,
+                phoneNumber,
+                email,
+                purpose,
+                useDate,
+                status,
+                scheduleID,
+                scheduleID2,
+            };
+            const reg = await registrationform.addRegistration(data);
+            return reg.registration.dataValues.RegistrationID;
+        }));
+        const groupRegistration = await grf.create({
+            email: email,
+            phoneNumber: phoneNumber,
+            purpose: purpose,
+            forms: ids
+        });
+        const groupRegID = groupRegistration.dataValues.groupRegistrationID;
+        await grfd.create({
+            scheduleID,
+            groupRegistrationID: groupRegID,
+        });
+
+        await grfd.create({
+            scheduleID: scheduleID2,
+            groupRegistrationID: groupRegID,
+        });
+
+        res.status(201).json(groupRegistration.dataValues);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
+
 // READ: Get a group registration by ID
-router.get('/:id', authenticateToken, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const groupRegistration = await grf.findByPk(req.params.id);
         if (groupRegistration) {
@@ -27,7 +74,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // UPDATE: Update a group registration by ID
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const [updated] = await grf.update(req.body, {
             where: { groupRegistrationID: req.params.id }
@@ -44,7 +91,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // DELETE: Delete a group registration by ID
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const deleted = await grf.destroy({
             where: { groupRegistrationID: req.params.id }

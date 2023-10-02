@@ -15,16 +15,36 @@ module.exports = (sequelize, DataTypes) => {
   }
   GroupRegistrationForm.init({
     groupRegistrationID: {
-      type: DataTypes.INTEGER,
+      allowNull: false,
+      autoIncrement: true,
       primaryKey: true,
-      autoIncrement: true  
+      type: DataTypes.INTEGER
     },
-    divisionName: DataTypes.INTEGER,
-    groupMembersName: DataTypes.STRING,
-    status: DataTypes.STRING
+    email: {
+      type: DataTypes.STRING
+    },
+    phoneNumber: {
+      type: DataTypes.STRING
+    },
+    purpose: {
+      type: DataTypes.STRING
+    },
+    forms: {
+      type: DataTypes.JSON
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    }
   }, {
     sequelize,
     modelName: 'GroupRegistrationForm',
+    tableName: 'GroupRegistrationForms',
+    timestamps: true, // This ensures createdAt and updatedAt fields are used
   });
   return GroupRegistrationForm;
 };

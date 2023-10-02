@@ -10,16 +10,16 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.RegistrationForm, {
-        foreignKey: 'registrationID',
-        onDelete: 'CASCADE' // If a RegistrationForm is deleted, its details are also deleted
-    });
-    
-    // Association to ShuttleSchedule
-    this.belongsTo(models.ShuttleSchedule, {
-        foreignKey: 'scheduleID',
-        as: 'schedulesDetails',
-        onDelete: 'CASCADE' // If a ShuttleSchedule is deleted, its details are also deleted
-    });
+        foreignKey: "registrationID",
+        onDelete: "CASCADE", // If a RegistrationForm is deleted, its details are also deleted
+      });
+
+      // Association to ShuttleSchedule
+      this.belongsTo(models.ShuttleSchedule, {
+        foreignKey: "scheduleID",
+        as: "schedulesDetails",
+        onDelete: "CASCADE", // If a ShuttleSchedule is deleted, its details are also deleted
+      });
     }
   }
   RegistrationFormDetail.init(

@@ -110,44 +110,50 @@ router.put("/processRequest", async (req, res) => {
     }
 });
 
+const addRegistration = async (reqBody) => {
+    const {
+        binusianID,
+        name,
+        phoneNumber,
+        email,
+        purpose,
+        useDate,
+        status,
+        scheduleID,
+        scheduleID2,
+    } = reqBody;
+
+    const registration = await rf.create({
+        binusianID,
+        name,
+        phoneNumber,
+        email,
+        purpose,
+        useDate,
+        status,
+    });
+    const newRegistrationID = registration.RegistrationID;
+
+    await rfd.create({
+        scheduleID,
+        registrationID: newRegistrationID,
+    });
+    await rfd.create({
+        scheduleID: scheduleID2,
+        registrationID: newRegistrationID,
+    });
+
+    return {
+        registration,
+        message: `New registration created with ID: ${newRegistrationID}`,
+    };
+};
+
 //ADD : Add Registration
 router.post("/add", async (req, res) => {
     try {
-        const {
-            binusianID,
-            name,
-            phoneNumber,
-            email,
-            purpose,
-            useDate,
-            status,
-            scheduleID,
-            scheduleID2,
-        } = req.body;
-
-        const registration = await rf.create({
-            binusianID,
-            name,
-            phoneNumber,
-            email,
-            purpose,
-            useDate,
-            status,
-        });
-        const newRegistrationID = registration.RegistrationID;
-
-        await rfd.create({
-            scheduleID,
-            registrationID: newRegistrationID,
-        });
-        await rfd.create({
-            scheduleID: scheduleID2,
-            registrationID: newRegistrationID,
-        });
-        res.status(201).json({
-            registration,
-            message: `New registration created with ID: ${newRegistrationID}`,
-        });
+        const result = await addRegistration(req.body);
+        res.status(201).json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -196,4 +202,4 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = { router , addRegistration};

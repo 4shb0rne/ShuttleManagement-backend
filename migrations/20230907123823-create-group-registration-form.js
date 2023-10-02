@@ -9,13 +9,16 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      divisionName: {
-        type: Sequelize.INTEGER
-      },
-      groupMembersName: {
+      email :{
         type: Sequelize.STRING
       },
-      status: {
+      phoneNumber: {
+        type: Sequelize.STRING
+      },
+      forms: {
+        type: Sequelize.JSON
+      },
+      purpose: {
         type: Sequelize.STRING
       },
       createdAt: {
