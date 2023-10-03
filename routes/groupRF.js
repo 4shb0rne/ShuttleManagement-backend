@@ -39,7 +39,8 @@ router.post('/add', async (req, res) => {
             email: email,
             phoneNumber: phoneNumber,
             purpose: purpose,
-            forms: ids
+            forms: ids,
+            useDate
         });
         const groupRegID = groupRegistration.dataValues.groupRegistrationID;
         await grfd.create({

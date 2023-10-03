@@ -36,6 +36,9 @@ module.exports = (sequelize, DataTypes) => {
     forms: {
       type: DataTypes.JSON
     },
+    useDate: {
+      type: DataTypes.DATE
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE
