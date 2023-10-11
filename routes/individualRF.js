@@ -34,11 +34,34 @@ router.get("/schedule", async (req, res) => {
     }
 });
 
+router.get("/newest", async (req, res) =>{
+    try{
+        const registrations = await rf.findAll({
+            order: [
+                ['created_at', 'DESC']
+            ],
+            include: [
+                {
+                    model: rfd,
+                    as: "details",
+                    include: [
+                        {
+                            model: Shuttleschedule,
+                            as: "schedulesDetails"
+                        }
+                    ]
+                }
+            ]
+        });
+        res.status(200).json(registrations);
+    } catch(error){
+        res.status(500).json({ error: error.message });
+    }
+});
 
 router.get("/gets", async (req, res) => {
     try {
         const ids = req.query.ids.map(Number);
-        console.log(ids);
         const registrations = await rf.findAll({
             where: {
                 RegistrationID: {
