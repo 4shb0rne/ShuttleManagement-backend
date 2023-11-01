@@ -9,7 +9,7 @@ const { sequelize } = require("../models");
 //GET : Get Registration Datas by Schedule
 router.get("/schedule", async (req, res) => {
     try {
-        const scheduleID = parseInt(req.query.scheduleID, 10); // Convert to integer
+        const scheduleID = parseInt(req.query.scheduleID, 10); 
         const useDate = req.query.useDate;
         const details = await rfd.findAll({
             where: {
@@ -90,12 +90,12 @@ router.get("/gets", async (req, res) => {
 });
 
 
-//GET : Get Registration Datas that have status 'waiting'
+//GET : Get Registration Datas that have status 'Not Verified' (harus diganti)
 router.get("/groupRequest", async (req, res) => {
     try {
         const registrations = await rf.findAll({
             where: {
-                status: "Waiting",
+                status: "Not Verified",
             },
             include: [
                 {
@@ -107,7 +107,7 @@ router.get("/groupRequest", async (req, res) => {
                     include: [
                         {
                             model: Shuttleschedule,
-                            as: "schedulesDetails", // This should match the alias in the ShuttleSchedule model's associations.
+                            as: "schedulesDetails",
                         },
                     ],
                 },
@@ -121,6 +121,7 @@ router.get("/groupRequest", async (req, res) => {
     }
 });
 
+//harus diganti
 router.put("/processRequest", async (req, res) => {
     const registrationId = req.query.id;
     const processCode = req.query.processCode;
@@ -136,12 +137,13 @@ router.put("/processRequest", async (req, res) => {
         console.log(processCode);
         if (processCode == 1) {
             updatedRows = await rf.update(
-                { status: "Approved" },
+                { status: "Verified" },
                 { where: { RegistrationID: registrationId } }
             );
         } else {
+            //delete
             updatedRows = await rf.update(
-                { status: "Rejected" },
+                { status: "Not Verified" },
                 { where: { RegistrationID: registrationId } }
             );
         }
@@ -242,7 +244,7 @@ router.get("/:id", async (req, res) => {
                     include: [
                         {
                             model: Shuttleschedule,
-                            as: "schedulesDetails", // This should match the alias in the ShuttleSchedule model's associations.
+                            as: "schedulesDetails",
                         },
                     ],
                 },

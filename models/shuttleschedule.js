@@ -10,11 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.hasMany(models.RegistrationFormDetail, {
         foreignKey: "scheduleID",
-        as: "schedulesDetails", // This creates an alias for the relation for easier querying
+        as: "schedulesDetails",
       });
       this.hasMany(models.GroupRegistrationFormDetail, {
         foreignKey: "scheduleID",
-        as: "SchedulesDetails", // This creates an alias for the relation for easier querying
+        as: "SchedulesDetails",
       });
     }
   }

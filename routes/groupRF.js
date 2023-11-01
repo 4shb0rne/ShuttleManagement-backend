@@ -19,40 +19,39 @@ router.post('/add', async (req, res) => {
     } = req.body;
 
     try {
-        const ids = await Promise.all(forms.map(async form => {
-            const { binusianID, name } = form;
-            const data = {
-                binusianID,
-                name,
-                phoneNumber,
-                email,
-                purpose,
-                useDate,
-                status,
-                scheduleID,
-                scheduleID2,
-            };
-            const reg = await registrationform.addRegistration(data);
-            return reg.registration.dataValues.RegistrationID;
-        }));
+        // const ids = await Promise.all(forms.map(async form => {
+        //     const { binusianID, name } = form;
+        //     const data = {
+        //         binusianID,
+        //         name,
+        //         phoneNumber,
+        //         email,
+        //         purpose,
+        //         useDate,
+        //         status,
+        //         scheduleID,
+        //         scheduleID2
+        //     };
+        //     const reg = await registrationform.addRegistration(data);
+        //     return reg.registration.dataValues.RegistrationID;
+        // }));
         const groupRegistration = await grf.create({
             email: email,
             phoneNumber: phoneNumber,
             purpose: purpose,
-            forms: ids,
-            useDate
+            forms: forms,
+            useDate,
+            status: "Not Verified"
         });
         const groupRegID = groupRegistration.dataValues.groupRegistrationID;
         await grfd.create({
             scheduleID,
             groupRegistrationID: groupRegID,
         });
-
         await grfd.create({
             scheduleID: scheduleID2,
             groupRegistrationID: groupRegID,
         });
-
         res.status(201).json(groupRegistration.dataValues);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -79,23 +78,6 @@ router.get('/:id', async (req, res) => {
         });
         if (groupRegistration) {
             res.json(groupRegistration);
-        } else {
-            res.status(404).json({ error: 'Group Registration not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// UPDATE: Update a group registration by ID
-router.put('/:id', async (req, res) => {
-    try {
-        const [updated] = await grf.update(req.body, {
-            where: { groupRegistrationID: req.params.id }
-        });
-        if (updated) {
-            const updatedGroupRegistration = await grf.findByPk(req.params.id);
-            res.json(updatedGroupRegistration);
         } else {
             res.status(404).json({ error: 'Group Registration not found' });
         }

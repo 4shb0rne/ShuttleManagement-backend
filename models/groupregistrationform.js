@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasMany(models.GroupRegistrationFormDetail, {
         foreignKey: 'groupRegistrationID',
-        as: 'details' // This creates an alias for the relation for easier querying
+        as: 'details'
     });
     }
   }
@@ -38,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     useDate: {
       type: DataTypes.DATE
+    },
+    status: {
+      type: DataTypes.STRING
     },
     createdAt: {
       allowNull: false,

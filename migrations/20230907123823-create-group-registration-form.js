@@ -24,6 +24,9 @@ module.exports = {
       useDate: {
         type: Sequelize.DATE
       },
+      status: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

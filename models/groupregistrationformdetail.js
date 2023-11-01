@@ -12,14 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.GroupRegistrationForm, {
         foreignKey: "groupRegistrationID",
-        onDelete: "CASCADE", // If a RegistrationForm is deleted, its details are also deleted
+        onDelete: "CASCADE",
       });
 
       // Association to ShuttleSchedule
       this.belongsTo(models.ShuttleSchedule, {
         foreignKey: "scheduleID",
         as: "SchedulesDetails",
-        onDelete: "CASCADE", // If a ShuttleSchedule is deleted, its details are also deleted
+        onDelete: "CASCADE",
       });
     }
   }

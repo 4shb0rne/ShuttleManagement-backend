@@ -12,6 +12,22 @@ router.get("/", async function (req, res, next) {
     }
 });
 
+router.post('/add', async (req, res) => {
+    try {
+      const { departingLocation, destinationLocation, departureTime } = req.body;
+      const newSchedule = await Shuttleschedule.create({
+        departingLocation,
+        destinationLocation,
+        departureTime,
+      });
+      res.status(201).json(newSchedule);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while creating the schedule.' });
+    }
+  });
+  
+
 //get schedules based on departing location
 router.get("/get-by-origin", async function (req, res, next) {
     try {
