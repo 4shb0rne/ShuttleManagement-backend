@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 var rf = require("../models").RegistrationForm;
 var rfd = require("../models").RegistrationFormDetail;
+var gf = require("../models").GroupRegistrationForm;
+var gfd = require("../models").GroupRegistrationFormDetail;
 var Shuttleschedule = require("../models").ShuttleSchedule;
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
@@ -9,7 +11,7 @@ const { sequelize } = require("../models");
 //GET : Get Registration Datas by Schedule
 router.get("/schedule", async (req, res) => {
     try {
-        const scheduleID = parseInt(req.query.scheduleID, 10); 
+        const scheduleID = parseInt(req.query.scheduleID, 10);
         const useDate = req.query.useDate;
         const details = await rfd.findAll({
             where: {
@@ -34,12 +36,10 @@ router.get("/schedule", async (req, res) => {
     }
 });
 
-router.get("/newest", async (req, res) =>{
-    try{
+router.get("/newest", async (req, res) => {
+    try {
         const registrations = await rf.findAll({
-            order: [
-                ['created_at', 'DESC']
-            ],
+            order: [["created_at", "DESC"]],
             include: [
                 {
                     model: rfd,
@@ -47,14 +47,14 @@ router.get("/newest", async (req, res) =>{
                     include: [
                         {
                             model: Shuttleschedule,
-                            as: "schedulesDetails"
-                        }
-                    ]
-                }
-            ]
+                            as: "schedulesDetails",
+                        },
+                    ],
+                },
+            ],
         });
         res.status(200).json(registrations);
-    } catch(error){
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
@@ -65,8 +65,8 @@ router.get("/gets", async (req, res) => {
         const registrations = await rf.findAll({
             where: {
                 RegistrationID: {
-                    [Op.in]: ids
-                }
+                    [Op.in]: ids,
+                },
             },
             include: [
                 {
@@ -75,39 +75,69 @@ router.get("/gets", async (req, res) => {
                     include: [
                         {
                             model: Shuttleschedule,
-                            as: "schedulesDetails"
-                        }
-                    ]
-                }
-            ]
+                            as: "schedulesDetails",
+                        },
+                    ],
+                },
+            ],
         });
-        
-        res.status(200).json(registrations);
 
+        res.status(200).json(registrations);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-
 //GET : Get Registration Datas that have status 'Not Verified' (harus diganti)
+// router.get("/groupRequest", async (req, res) => {
+//     try {
+//         const registrations = await rf.findAll({
+//             where: {
+//                 status: "Not Verified",
+//             },
+//             include: [
+//                 {
+//                     model: rfd,
+//                     as: "details",
+//                     where: {
+//                         registrationID: sequelize.col("details.registrationID"),
+//                     },
+//                     include: [
+//                         {
+//                             model: Shuttleschedule,
+//                             as: "schedulesDetails",
+//                         },
+//                     ],
+//                 },
+//             ],
+//         });
+//         return res.status(200).json(registrations);
+//     } catch (err) {
+//         return res
+//             .status(500)
+//             .json({ message: "Server error", error: err.message });
+//     }
+// });
+
 router.get("/groupRequest", async (req, res) => {
     try {
-        const registrations = await rf.findAll({
+        const registrations = await gf.findAll({
             where: {
                 status: "Not Verified",
             },
             include: [
                 {
-                    model: rfd,
+                    model: gfd,
                     as: "details",
                     where: {
-                        registrationID: sequelize.col("details.registrationID"),
+                        groupRegistrationID: sequelize.col(
+                            "details.groupRegistrationID"
+                        ),
                     },
                     include: [
                         {
                             model: Shuttleschedule,
-                            as: "schedulesDetails",
+                            as: "SchedulesDetails",
                         },
                     ],
                 },
@@ -123,10 +153,10 @@ router.get("/groupRequest", async (req, res) => {
 
 //harus diganti
 router.put("/processRequest", async (req, res) => {
-    const registrationId = req.query.id;
+    const groupRegistrationId = req.query.id;
     const processCode = req.query.processCode;
 
-    if (!registrationId) {
+    if (!groupRegistrationId) {
         return res
             .status(400)
             .json({ success: false, message: "ID is required" });
@@ -136,15 +166,15 @@ router.put("/processRequest", async (req, res) => {
         let updatedRows;
         console.log(processCode);
         if (processCode == 1) {
-            updatedRows = await rf.update(
+            updatedRows = await gf.update(
                 { status: "Verified" },
-                { where: { RegistrationID: registrationId } }
+                { where: { groupRegistrationID: groupRegistrationId } }
             );
         } else {
             //delete
-            updatedRows = await rf.update(
-                { status: "Not Verified" },
-                { where: { RegistrationID: registrationId } }
+            updatedRows = await gf.update(
+                { status: "Rejected" },
+                { where: { groupRegistrationID: groupRegistrationId } }
             );
         }
 
@@ -260,4 +290,4 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-module.exports = { router , addRegistration};
+module.exports = { router, addRegistration };
