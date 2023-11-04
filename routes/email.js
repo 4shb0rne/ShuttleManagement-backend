@@ -27,7 +27,7 @@ router.post("/send", (req, res) => {
                 </div>
                 <div style="margin-top: 20px;">
                     <h2>Dear, ${req.body.name}</h2>
-                    <p>Berikut adalah konfirmasi untuk reservasi shuttle pada tanggal <b>${req.body.date}</b> pukul ${req.body.time} dengan data penumpang sebagai berikut :</p>
+                    <p>Berikut adalah konfirmasi untuk reservasi shuttle pada tanggal <b>${req.body.date}</b> pukul <b>${req.body.time1}</b> dan <b>${req.body.time2}</b> dengan data penumpang sebagai berikut :</p>
                     <p>BinusianID : ${req.body.binusianID}</p>
                     <p>Nama       : ${req.body.name}</p>
                     <p>Urusan     : ${req.body.purpose}</p>
