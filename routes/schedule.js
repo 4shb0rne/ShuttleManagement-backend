@@ -36,8 +36,6 @@ router.post('/add', authenticateToken, async (req, res) => {
     }
 });
 
-  
-
 //get schedules based on departing location
 router.get("/get-by-origin", async function (req, res, next) {
     try {
