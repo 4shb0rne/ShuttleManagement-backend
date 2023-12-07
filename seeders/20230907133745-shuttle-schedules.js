@@ -20,6 +20,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "07:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -27,6 +28,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "09:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -34,6 +36,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "11:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -41,6 +44,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "13:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -48,6 +52,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "15:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -55,6 +60,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "17:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -62,6 +68,7 @@ module.exports = {
                     destinationLocation: "Alsut",
                     departureTime: "19:10:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -69,6 +76,7 @@ module.exports = {
                     destinationLocation: "Anggrek",
                     departureTime: "07:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -76,6 +84,7 @@ module.exports = {
                     destinationLocation: "Anggrek",
                     departureTime: "09:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -83,6 +92,7 @@ module.exports = {
                     destinationLocation: "Anggrek",
                     departureTime: "11:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -90,6 +100,7 @@ module.exports = {
                     destinationLocation: "Anggrek",
                     departureTime: "13:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -97,6 +108,7 @@ module.exports = {
                     destinationLocation: "Anggrek",
                     departureTime: "15:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
                 {
@@ -104,6 +116,7 @@ module.exports = {
                     destinationLocation: "Anggrek",
                     departureTime: "17:30:00",
                     createdAt: new Date(),
+                    day: "Weekday",
                     updatedAt: new Date(),
                 },
             ],

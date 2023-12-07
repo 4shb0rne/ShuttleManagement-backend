@@ -5,7 +5,12 @@ var authenticateToken = require('../middleware/authJWT');
 //get all schedules
 router.get("/", async function (req, res, next) {
     try {
-        const schedules = await Shuttleschedule.findAll();
+        const { day } = req.query;
+        const schedules = await Shuttleschedule.findAll({
+            where: {
+                day: day
+            },
+        });
         res.json(schedules);
     } catch (error) {
         next(error);
@@ -14,12 +19,13 @@ router.get("/", async function (req, res, next) {
 
 router.post('/add', authenticateToken, async (req, res) => {
     try {
-        const { departingLocation, destinationLocation, departureTime } = req.body;
+        const { departingLocation, destinationLocation, departureTime, day } = req.body;
         const existingSchedule = await Shuttleschedule.findOne({
             where: {
                 departingLocation,
                 destinationLocation,
-                departureTime
+                departureTime,
+                day
             }
         });
         if (existingSchedule) {
@@ -29,6 +35,7 @@ router.post('/add', authenticateToken, async (req, res) => {
             departingLocation,
             destinationLocation,
             departureTime,
+            day
         });
         res.status(201).json(newSchedule);
     } catch (error) {
@@ -39,15 +46,16 @@ router.post('/add', authenticateToken, async (req, res) => {
 //get schedules based on departing location
 router.get("/get-by-origin", async function (req, res, next) {
     try {
-        const { origin } = req.query;
-        if (!origin) {
+        const { origin, day } = req.query;
+        if (!origin || !day) {
             return res
                 .status(400)
-                .json({ error: "origin query parameter is required" });
+                .json({ error: "origin or day query parameter is required" });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
                 departingLocation: origin,
+                day: day
             },
         });
         res.json(schedules);
@@ -57,15 +65,16 @@ router.get("/get-by-origin", async function (req, res, next) {
 });
 router.get("/get-by-destination", async function (req, res, next) {
     try {
-        const { destination } = req.query;
-        if (!destination) {
+        const { destination, day } = req.query;
+        if (!destination || !day ) {
             return res
                 .status(400)
-                .json({ error: "destination query parameter is required" });
+                .json({ error: "destination or day query parameter is required" });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
-                destinationLocation : destination
+                destinationLocation : destination,
+                day: day
             },
         });
         res.json(schedules);

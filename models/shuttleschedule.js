@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       departingLocation: DataTypes.STRING,
       destinationLocation: DataTypes.STRING,
       departureTime: DataTypes.TIME,
+      day: DataTypes.STRING
     },
     {
       sequelize,

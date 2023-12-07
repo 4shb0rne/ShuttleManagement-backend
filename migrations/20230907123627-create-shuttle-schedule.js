@@ -18,6 +18,9 @@ module.exports = {
       departureTime: {
         type: Sequelize.TIME
       },
+      day: { // Weekday, Friday, Saturday
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
