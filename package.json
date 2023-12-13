@@ -21,6 +21,7 @@
     "mysql2": "^3.6.5",
     "nodemailer": "^6.9.5",
     "pdfmake": "^0.2.8",
+    "qrcode": "^1.5.3",
     "sequelize": "^6.32.1"
   },
   "devDependencies": {
