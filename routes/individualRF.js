@@ -7,6 +7,125 @@ var gfd = require("../models").GroupRegistrationFormDetail;
 var Shuttleschedule = require("../models").ShuttleSchedule;
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
+const PdfPrinter = require('pdfmake');
+
+var fonts = {
+    Roboto: {
+        normal: 'public/fonts/Roboto-Regular.ttf',
+        bold: 'public/fonts/Roboto-Medium.ttf',
+        italics: 'public/fonts/Roboto-Italic.ttf',
+        bolditalics: 'public/fonts/Roboto-MediumItalic.ttf'
+    }
+};
+
+function generatePdf(data) {
+    const printer = new PdfPrinter(fonts);
+    // Group data by departureTime
+    const groupedByTime = {};
+    data.forEach(item => {
+        item.details.forEach(detail => {
+            // Accessing the schedulesDetails object
+            const schedule = detail.schedulesDetails;
+            const time = schedule.departureTime;
+            if (!groupedByTime[time]) {
+                groupedByTime[time] = [];
+            }
+            groupedByTime[time].push({
+                binusianID: item.binusianID,
+                name: item.name,
+                phoneNumber: item.phoneNumber,
+                email: item.email
+            });
+        });
+    });
+
+    // Prepare content for each departureTime
+    const content = [
+        { text: 'Registration Details', style: 'header' },
+        { text: '', margin: [0, 10, 0, 0] }
+    ];
+
+    Object.keys(groupedByTime).forEach(time => {
+        content.push({ text: `Departure Time: ${time}`, style: 'subheader' });
+        content.push({ text: '', margin: [0, 5, 0, 0] });
+
+        const tableBody = [['BinusianID', 'Name', 'Phone', 'Email', 'Attendance']];
+        groupedByTime[time].forEach(item => {
+            tableBody.push([
+                item.binusianID,
+                item.name,
+                item.phoneNumber,
+                item.email,
+                "   "
+            ]);
+        });
+
+        content.push({
+            style: 'tableExample',
+            table: {
+                body: tableBody
+            }
+        });
+
+        content.push({ text: '', margin: [0, 10, 0, 0] }); // Space between tables
+    });
+
+    const docDefinition = {
+        content: content,
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true
+            },
+            subheader: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 5, 0, 5]
+            },
+            tableExample: {}
+        }
+    };
+
+    return printer.createPdfKitDocument(docDefinition);
+}
+
+//GET : Based on Date + Departing Location
+router.get("/get-schedule-by-date", async (req, res) => {
+    try {
+        const departingLocation = req.query.departingLocation;
+        const useDate = req.query.useDate;
+        const details = await rf.findAll({
+            where: {
+                useDate: {
+                    [Op.eq]: useDate
+                }
+            },
+            include: [{
+                model: rfd,
+                as: 'details',
+                include: [{
+                    model: Shuttleschedule,
+                    as: 'schedulesDetails',
+                    where: {
+                        departingLocation: {
+                            [Op.eq]: departingLocation
+                        }
+                    },
+                    attributes: ['scheduleID', 'departureTime']
+                }]
+            }]
+        });
+
+        // Generate PDF
+        const pdfDoc = generatePdf(details);
+        res.setHeader('Content-Type', 'application/pdf');
+        pdfDoc.pipe(res);
+        pdfDoc.end();
+    } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+});
+
 
 //GET : Get Registration Datas by Schedule
 router.get("/schedule", async (req, res) => {
