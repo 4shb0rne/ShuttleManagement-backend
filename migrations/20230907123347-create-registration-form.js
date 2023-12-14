@@ -30,9 +30,13 @@ module.exports = {
       otp: {
         type: Sequelize.STRING
       },
-      status: {
+      verification_status :{
         type: Sequelize.STRING,
-        defaultValue: false
+        defaultValue: "Unverified"
+      },
+      attendance_status: {
+        type: Sequelize.STRING,
+        defaultValue: "Absent"
       },
       createdAt: {
         allowNull: false,

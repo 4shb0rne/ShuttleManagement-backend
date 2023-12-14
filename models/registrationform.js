@@ -28,8 +28,9 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       purpose: DataTypes.STRING,
       useDate: DataTypes.DATE,
-      otp: { type: DataTypes.STRING, defaultValue: false },
-      status: DataTypes.STRING,
+      otp: DataTypes.STRING,
+      verification_status: DataTypes.STRING,
+      attendance_status: DataTypes.STRING
     },
     {
       sequelize,
