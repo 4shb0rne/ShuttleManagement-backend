@@ -18,6 +18,15 @@ var fonts = {
     }
 };
 
+function generateOTP() {
+    let otp = '';
+    for(let i = 0; i < 6; i++) {
+        otp += Math.floor(Math.random() * 10);
+    }
+    console.log(otp);
+    return otp;
+}
+
 function generatePdf(data) {
     const printer = new PdfPrinter(fonts);
     // Group data by departureTime
@@ -328,6 +337,7 @@ const addRegistration = async (reqBody) => {
         status,
         scheduleID,
         scheduleID2,
+        otp
     } = reqBody;
 
     const registration = await rf.create({
@@ -338,6 +348,7 @@ const addRegistration = async (reqBody) => {
         purpose,
         useDate,
         status,
+        otp
     });
     const newRegistrationID = registration.RegistrationID;
 
@@ -358,10 +369,48 @@ const addRegistration = async (reqBody) => {
 
 //ADD : Add Registration
 router.post("/add", async (req, res) => {
+    const otp = generateOTP();
     try {
-        const result = await addRegistration(req.body);
+        const newRegistrationData = { ...req.body, otp: otp };
+        console.log(newRegistrationData);
+        const result = await addRegistration(newRegistrationData);
         res.status(201).json(result);
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get("/getOtp", async (req, res) => {
+    try {
+        const registration = await rf.findByPk(req.body.RegistrationID);
+        if (registration) {
+            res.json({ otp: registration.otp });
+        } else {
+            res.status(404).json({ error: "Registration not found" });
+        }
+    } catch(error) {
+        res.status(500).json({ error : error.message });
+    }
+});
+
+router.get("/verify-otp", async (req, res) => {
+    try {
+        const { registrationID, otp } = req.query;
+        const registration = await rf.findByPk(registrationID);
+
+        if (registration) {
+            if (registration.otp === otp) {
+                registration.status = 'true'; 
+                await registration.save();
+
+                res.json({ message: "OTP verified successfully." });
+            } else {
+                res.status(400).json({ error: "Invalid OTP." });
+            }
+        } else {
+            res.status(404).json({ error: "Registration not found." });
+        }
+    } catch(error) {
         res.status(500).json({ error: error.message });
     }
 });

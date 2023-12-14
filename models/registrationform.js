@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class RegistrationForm extends Model {
     /**
@@ -12,27 +10,31 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.RegistrationFormDetail, {
-        foreignKey: 'registrationID',
-        as: 'details'
-    });
+        foreignKey: "registrationID",
+        as: "details",
+      });
     }
   }
-  RegistrationForm.init({
-    RegistrationID: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true  
+  RegistrationForm.init(
+    {
+      RegistrationID: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      binusianID: DataTypes.STRING,
+      name: DataTypes.STRING,
+      phoneNumber: DataTypes.STRING,
+      email: DataTypes.STRING,
+      purpose: DataTypes.STRING,
+      useDate: DataTypes.DATE,
+      otp: { type: DataTypes.STRING, defaultValue: false },
+      status: DataTypes.STRING,
     },
-    binusianID: DataTypes.STRING,
-    name: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING,
-    email: DataTypes.STRING,
-    purpose: DataTypes.STRING,
-    useDate: DataTypes.DATE,
-    status: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'RegistrationForm',
-  });
+    {
+      sequelize,
+      modelName: "RegistrationForm",
+    }
+  );
   return RegistrationForm;
 };

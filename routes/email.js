@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
 const nodemailer = require("nodemailer");
-const QRCode = require("qrcode");
 
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -14,14 +13,7 @@ let transporter = nodemailer.createTransport({
 });
 
 router.post("/send", async(req, res) => {
-    const qrUrl = req.body.url;
     try {
-        const qrCodeDataURL = await QRCode.toDataURL(qrUrl, {
-            type: 'image/png',
-            margin: 1,
-            width: 200
-        });
-
         let emailContent = `
         <!DOCTYPE html>
             <html>
@@ -36,8 +28,6 @@ router.post("/send", async(req, res) => {
                     </div>
                     <div style="margin-top: 20px;">
                         <h2>Dear, ${req.body.name}</h2>
-                        <p>Booking Detail : </p>
-                        <img src="${qrCodeDataURL}" alt="QR Code" />
                         <p>Berikut adalah konfirmasi untuk reservasi shuttle pada tanggal <b>${req.body.date}</b> pukul <b>${req.body.time1}</b> dan <b>${req.body.time2}</b> dengan data penumpang sebagai berikut :</p>
                         <p>BinusianID : ${req.body.binusianID}</p>
                         <p>Nama       : ${req.body.name}</p>

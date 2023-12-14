@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
+    binusian_id: DataTypes.STRING,
     username: DataTypes.STRING,
     password: DataTypes.STRING
   }, {

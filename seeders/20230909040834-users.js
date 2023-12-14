@@ -15,6 +15,7 @@ module.exports = {
     const bcrypt = require("bcryptjs");
     await queryInterface.bulkInsert("Users", [
       {
+        binusian_id: "",
         username: "SLC",
         password: bcrypt.hashSync('SLC123', 10),
         createdAt: new Date(),

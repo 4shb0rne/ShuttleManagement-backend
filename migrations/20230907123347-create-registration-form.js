@@ -27,8 +27,12 @@ module.exports = {
       useDate: {
         type: Sequelize.DATE
       },
-      status: {
+      otp: {
         type: Sequelize.STRING
+      },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
