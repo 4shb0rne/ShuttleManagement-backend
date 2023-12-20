@@ -43,14 +43,36 @@ router.post('/add', authenticateToken, async (req, res) => {
     }
 });
 
-//get schedules based on departing location
-router.get("/get-by-origin", async function (req, res, next) {
+//get schedules
+router.get("/get-schedule-data", async function (req, res, next) {
+    try {
+        const { origin, destination, day } = req.query;
+        if (!origin || !destination || !day) {
+            return res
+                .status(400)
+                .json({ error: "origin, destination, and day query parameters are required" });
+        }
+        const schedules = await Shuttleschedule.findAll({
+            where: {
+                departingLocation: origin,
+                destinationLocation: destination,
+                day: day
+            },
+        });
+        res.json(schedules);
+    } catch (error) {
+        next(error);
+    }
+});
+
+//get schedules
+router.get("/get-schedule-by-origin", async function (req, res, next) {
     try {
         const { origin, day } = req.query;
         if (!origin || !day) {
             return res
                 .status(400)
-                .json({ error: "origin or day query parameter is required" });
+                .json({ error: "origin and day query parameters are required" });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
@@ -63,25 +85,7 @@ router.get("/get-by-origin", async function (req, res, next) {
         next(error);
     }
 });
-router.get("/get-by-destination", async function (req, res, next) {
-    try {
-        const { destination, day } = req.query;
-        if (!destination || !day ) {
-            return res
-                .status(400)
-                .json({ error: "destination or day query parameter is required" });
-        }
-        const schedules = await Shuttleschedule.findAll({
-            where: {
-                destinationLocation : destination,
-                day: day
-            },
-        });
-        res.json(schedules);
-    } catch (error) {
-        next(error);
-    }
-});
+
 
 
 
