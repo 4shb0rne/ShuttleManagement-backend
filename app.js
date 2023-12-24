@@ -7,7 +7,6 @@ var logger = require("morgan");
 require("dotenv").config();
 
 const bodyParser = require("body-parser");
-var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var scheduleRouter = require("./routes/schedule");
 var individualRF = require("./routes/individualRF").router;
@@ -31,7 +30,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
 
-app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/schedules", scheduleRouter);
 app.use("/registration", individualRF);

@@ -5,6 +5,7 @@ var rfd = require("../models").RegistrationFormDetail;
 var gf = require("../models").GroupRegistrationForm;
 var gfd = require("../models").GroupRegistrationFormDetail;
 var Shuttleschedule = require("../models").ShuttleSchedule;
+const authenticateToken = require('../middleware/authJWT');
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const PdfPrinter = require('pdfmake');
@@ -380,9 +381,9 @@ router.post("/add", async (req, res) => {
     }
 });
 
-router.get("/getOtp", async (req, res) => {
+router.get("/getOtp", authenticateToken, async (req, res) => {
     try {
-        const registration = await rf.findByPk(req.body.RegistrationID);
+        const registration = await rf.findByPk(req.query.RegistrationID);
         if (registration) {
             res.json({ otp: registration.otp });
         } else {
@@ -400,9 +401,8 @@ router.get("/verify-otp", async (req, res) => {
 
         if (registration) {
             if (registration.otp === otp) {
-                registration.status = 'true'; 
+                registration.verification_status = 'Verified'; 
                 await registration.save();
-
                 res.json({ message: "OTP verified successfully." });
             } else {
                 res.status(400).json({ error: "Invalid OTP." });
