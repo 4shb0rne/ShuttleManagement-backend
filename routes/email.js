@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const nodemailer = require("nodemailer");
+const qrcode = require('qrcode');
 
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -12,7 +13,13 @@ let transporter = nodemailer.createTransport({
     },
 });
 
+
 router.post("/send", async(req, res) => {
+    const url = "http://"+process.env.WEB_URL+"/registrationdetail?registrationID="+req.body.form_id;
+    //console.log(url);
+    const qrCodeDataURL = await qrcode.toDataURL(url);
+    // console.log(qrCodeDataURL);
+    console.log(encodeURIComponent(url));
     try {
         let emailContent = `
         <!DOCTYPE html>
@@ -25,6 +32,12 @@ router.post("/send", async(req, res) => {
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f7f7f7; border: 1px solid #ddd;">
                     <div>
                         <img src="https://upload.wikimedia.org/wikipedia/id/a/a2/Logo_Binus_University.png" alt="Your Brand Logo" width="200" />
+                    </div>
+                    <div>
+                        <img src="${qrCodeDataURL}" alt="QR Code" style="width: 150px; height: 150px;" />
+                    </div>
+                    <div>
+                        <a href="${url}">Click Here to Verify</a>
                     </div>
                     <div style="margin-top: 20px;">
                         <h2>Dear, ${req.body.name}</h2>
@@ -45,6 +58,7 @@ router.post("/send", async(req, res) => {
             to: req.body.to,
             subject: req.body.subject,
             html: emailContent,
+            attachDataUrls: true
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
