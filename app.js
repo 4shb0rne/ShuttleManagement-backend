@@ -13,7 +13,7 @@ var individualRF = require("./routes/individualRF").router;
 var groupRF = require("./routes/groupRF");
 var email = require('./routes/email');
 var attendance = require('./routes/attendance');
-
+var specialdate = require('./routes/specialdate');
 
 var app = express();
 
@@ -36,6 +36,9 @@ app.use("/registration", individualRF);
 app.use("/group-registration", groupRF);
 app.use("/email", email);
 app.use("/attendance", attendance);
+app.use("/specialdate", specialdate);
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));

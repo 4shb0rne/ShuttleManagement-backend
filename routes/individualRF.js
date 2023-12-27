@@ -92,7 +92,15 @@ function generatePdf(data) {
                 bold: true,
                 margin: [0, 5, 0, 5]
             },
-            tableExample: {}
+            tableExample: {
+                margin: [0, 5, 0, 15] 
+            }
+        },
+        layout: {
+            paddingLeft: function (i, node) { return 10; },
+            paddingRight: function (i, node) { return 10; },
+            paddingTop: function (i, node) { return 5; },
+            paddingBottom: function (i, node) { return 5; }
         }
     };
 
@@ -216,37 +224,6 @@ router.get("/gets", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-//GET : Get Registration Datas that have status 'Not Verified' (harus diganti)
-// router.get("/groupRequest", async (req, res) => {
-//     try {
-//         const registrations = await rf.findAll({
-//             where: {
-//                 status: "Not Verified",
-//             },
-//             include: [
-//                 {
-//                     model: rfd,
-//                     as: "details",
-//                     where: {
-//                         registrationID: sequelize.col("details.registrationID"),
-//                     },
-//                     include: [
-//                         {
-//                             model: Shuttleschedule,
-//                             as: "schedulesDetails",
-//                         },
-//                     ],
-//                 },
-//             ],
-//         });
-//         return res.status(200).json(registrations);
-//     } catch (err) {
-//         return res
-//             .status(500)
-//             .json({ message: "Server error", error: err.message });
-//     }
-// });
 
 router.get("/groupRequest", async (req, res) => {
     try {

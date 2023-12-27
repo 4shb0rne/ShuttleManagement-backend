@@ -19,7 +19,12 @@ module.exports = {
         type: Sequelize.TIME
       },
       day: { // Weekday, Friday, Saturday
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      date : {  //only for special date
+        type: Sequelize.STRING,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
