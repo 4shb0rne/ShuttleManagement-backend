@@ -3,7 +3,7 @@ var router = express.Router();
 var SpecialDate = require("../models").SpecialDate;
 var Shuttleschedule = require("../models").ShuttleSchedule;
 
-app.post('/add', async (req, res) => {
+router.post('/add', async (req, res) => {
     try {
         const { date, reason } = req.body;
         if (!date || !reason) {
@@ -18,9 +18,9 @@ app.post('/add', async (req, res) => {
     }
 });
 
-app.get('/validate', async (req, res) => {
+router.get('/validate', async (req, res) => {
     try {
-        const { date } = req.query;
+        const { date, origin } = req.query;
         const dateObj = new Date(date);
 
         if (isNaN(dateObj.getTime())) {
@@ -32,6 +32,7 @@ app.get('/validate', async (req, res) => {
         if (specialDate) {
             const schedules = await Shuttleschedule.findAll({
                 where: {
+                    departingLocation: origin,
                     date: specialDate
                 },
             });
