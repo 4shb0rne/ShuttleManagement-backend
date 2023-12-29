@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
-    date: DataTypes.DATE,
+    date: DataTypes.STRING,
     reason: DataTypes.STRING
   }, {
     sequelize,

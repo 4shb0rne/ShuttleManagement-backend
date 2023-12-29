@@ -43,6 +43,32 @@ router.post('/add', authenticateToken, async (req, res) => {
     }
 });
 
+router.post('/addspecial', authenticateToken, async (req, res) => {
+    try {
+        const { departingLocation, destinationLocation, departureTime, date } = req.body;
+        const existingSchedule = await Shuttleschedule.findOne({
+            where: {
+                departingLocation,
+                destinationLocation,
+                departureTime,
+                date
+            }
+        });
+        if (existingSchedule) {
+            return res.status(409).json({ error: 'A similar schedule already exists.' });
+        }
+        const newSchedule = await Shuttleschedule.create({
+            departingLocation,
+            destinationLocation,
+            departureTime,
+            date
+        });
+        res.status(201).json(newSchedule);
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+});
+
 //get schedules
 router.get("/get-schedule-data", async function (req, res, next) {
     try {

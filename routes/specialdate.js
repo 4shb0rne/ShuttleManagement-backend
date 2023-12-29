@@ -10,6 +10,13 @@ router.post('/add', async (req, res) => {
             return res.status(400).send({ message: "Date and reason are required" });
         }
 
+        // Check if a SpecialDate with the same date already exists
+        const existingSpecialDate = await SpecialDate.findOne({ where: { date } });
+        if (existingSpecialDate) {
+            return res.status(409).send({ message: "A record with the same date already exists" });
+        }
+
+        // If not, create a new SpecialDate
         const newSpecialDate = await SpecialDate.create({ date, reason });
         return res.status(201).send(newSpecialDate);
     } catch (error) {
@@ -17,6 +24,7 @@ router.post('/add', async (req, res) => {
         return res.status(500).send({ message: "Internal Server Error" });
     }
 });
+
 
 router.get('/validate', async (req, res) => {
     try {
@@ -27,13 +35,13 @@ router.get('/validate', async (req, res) => {
             return res.status(400).send({ message: "Invalid date format" });
         }
 
-        const specialDate = await SpecialDate.findOne({ where: { date: dateObj } });
+        const specialDate = await SpecialDate.findOne({ where: { date: date } });
 
         if (specialDate) {
             const schedules = await Shuttleschedule.findAll({
                 where: {
                     departingLocation: origin,
-                    date: specialDate
+                    date: date
                 },
             });
             return res.status(200).send({ exists: true, specialDate, schedules });
