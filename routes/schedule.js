@@ -1,14 +1,14 @@
 var express = require("express");
 var router = express.Router();
 var Shuttleschedule = require("../models").ShuttleSchedule;
-var authenticateToken = require('../middleware/authJWT');
+var authenticateToken = require("../middleware/authJWT");
 //get all schedules
 router.get("/", async function (req, res, next) {
     try {
         const { day } = req.query;
         const schedules = await Shuttleschedule.findAll({
             where: {
-                day: day
+                day: day,
             },
         });
         res.json(schedules);
@@ -17,25 +17,28 @@ router.get("/", async function (req, res, next) {
     }
 });
 
-router.post('/add', authenticateToken, async (req, res) => {
+router.post("/add", authenticateToken, async (req, res) => {
     try {
-        const { departingLocation, destinationLocation, departureTime, day } = req.body;
+        const { departingLocation, destinationLocation, departureTime, day } =
+            req.body;
         const existingSchedule = await Shuttleschedule.findOne({
             where: {
                 departingLocation,
                 destinationLocation,
                 departureTime,
-                day
-            }
+                day,
+            },
         });
         if (existingSchedule) {
-            return res.status(409).json({ error: 'A similar schedule already exists.' });
+            return res
+                .status(409)
+                .json({ error: "A similar schedule already exists." });
         }
         const newSchedule = await Shuttleschedule.create({
             departingLocation,
             destinationLocation,
             departureTime,
-            day
+            day,
         });
         res.status(201).json(newSchedule);
     } catch (error) {
@@ -43,25 +46,29 @@ router.post('/add', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/addspecial', authenticateToken, async (req, res) => {
+router.post("/addspecial", authenticateToken, async (req, res) => {
     try {
-        const { departingLocation, destinationLocation, departureTime, date } = req.body;
+        const { departingLocation, destinationLocation, departureTime, date } =
+            req.body;
+        console.log(departureTime, date);
         const existingSchedule = await Shuttleschedule.findOne({
             where: {
                 departingLocation,
                 destinationLocation,
                 departureTime,
-                date
-            }
+                date,
+            },
         });
         if (existingSchedule) {
-            return res.status(409).json({ error: 'A similar schedule already exists.' });
+            return res
+                .status(409)
+                .json({ error: "A similar schedule already exists." });
         }
         const newSchedule = await Shuttleschedule.create({
             departingLocation,
             destinationLocation,
             departureTime,
-            date
+            date,
         });
         res.status(201).json(newSchedule);
     } catch (error) {
@@ -76,13 +83,15 @@ router.get("/get-schedule-data", async function (req, res, next) {
         if (!origin || !destination || !day) {
             return res
                 .status(400)
-                .json({ error: "origin, destination, and day query parameters are required" });
+                .json({
+                    error: "origin, destination, and day query parameters are required",
+                });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
                 departingLocation: origin,
                 destinationLocation: destination,
-                day: day
+                day: day,
             },
         });
         res.json(schedules);
@@ -98,12 +107,14 @@ router.get("/get-schedule-by-origin", async function (req, res, next) {
         if (!origin || !day) {
             return res
                 .status(400)
-                .json({ error: "origin and day query parameters are required" });
+                .json({
+                    error: "origin and day query parameters are required",
+                });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
                 departingLocation: origin,
-                day: day
+                day: day,
             },
         });
         res.json(schedules);
@@ -111,8 +122,5 @@ router.get("/get-schedule-by-origin", async function (req, res, next) {
         next(error);
     }
 });
-
-
-
 
 module.exports = router;
