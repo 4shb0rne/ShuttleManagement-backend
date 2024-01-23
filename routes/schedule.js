@@ -76,16 +76,38 @@ router.post("/addspecial", authenticateToken, async (req, res) => {
     }
 });
 
+// DELETE schedule
+router.delete(
+    "/delete/:scheduleID",
+    authenticateToken,
+    async function (req, res) {
+        try {
+            const { scheduleID } = req.params; 
+            const schedule = await Shuttleschedule.findByPk(scheduleID);
+            if (!schedule) {
+                return res.status(404).json({ error: "Schedule not found." });
+            }
+            // Delete the schedule
+            await Shuttleschedule.destroy({
+                where: {
+                    scheduleID: scheduleID, 
+                },
+            });
+            res.json({ message: "Schedule successfully deleted." });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
+
 //get schedules
 router.get("/get-schedule-data", async function (req, res, next) {
     try {
         const { origin, destination, day } = req.query;
         if (!origin || !destination || !day) {
-            return res
-                .status(400)
-                .json({
-                    error: "origin, destination, and day query parameters are required",
-                });
+            return res.status(400).json({
+                error: "origin, destination, and day query parameters are required",
+            });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
@@ -105,11 +127,9 @@ router.get("/get-schedule-by-origin", async function (req, res, next) {
     try {
         const { origin, day } = req.query;
         if (!origin || !day) {
-            return res
-                .status(400)
-                .json({
-                    error: "origin and day query parameters are required",
-                });
+            return res.status(400).json({
+                error: "origin and day query parameters are required",
+            });
         }
         const schedules = await Shuttleschedule.findAll({
             where: {
