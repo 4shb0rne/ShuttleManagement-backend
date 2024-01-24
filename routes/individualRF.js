@@ -5,23 +5,23 @@ var rfd = require("../models").RegistrationFormDetail;
 var gf = require("../models").GroupRegistrationForm;
 var gfd = require("../models").GroupRegistrationFormDetail;
 var Shuttleschedule = require("../models").ShuttleSchedule;
-const authenticateToken = require('../middleware/authJWT');
+const authenticateToken = require("../middleware/authJWT");
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
-const PdfPrinter = require('pdfmake');
+const PdfPrinter = require("pdfmake");
 
 var fonts = {
     Roboto: {
-        normal: 'public/fonts/Roboto-Regular.ttf',
-        bold: 'public/fonts/Roboto-Medium.ttf',
-        italics: 'public/fonts/Roboto-Italic.ttf',
-        bolditalics: 'public/fonts/Roboto-MediumItalic.ttf'
-    }
+        normal: "public/fonts/Roboto-Regular.ttf",
+        bold: "public/fonts/Roboto-Medium.ttf",
+        italics: "public/fonts/Roboto-Italic.ttf",
+        bolditalics: "public/fonts/Roboto-MediumItalic.ttf",
+    },
 };
 
 function generateOTP() {
-    let otp = '';
-    for(let i = 0; i < 6; i++) {
+    let otp = "";
+    for (let i = 0; i < 6; i++) {
         otp += Math.floor(Math.random() * 10);
     }
     console.log(otp);
@@ -32,8 +32,8 @@ function generatePdf(data) {
     const printer = new PdfPrinter(fonts);
     // Group data by departureTime
     const groupedByTime = {};
-    data.forEach(item => {
-        item.details.forEach(detail => {
+    data.forEach((item) => {
+        item.details.forEach((detail) => {
             // Accessing the schedulesDetails object
             const schedule = detail.schedulesDetails;
             const time = schedule.departureTime;
@@ -44,40 +44,42 @@ function generatePdf(data) {
                 binusianID: item.binusianID,
                 name: item.name,
                 phoneNumber: item.phoneNumber,
-                email: item.email
+                email: item.email,
             });
         });
     });
 
     // Prepare content for each departureTime
     const content = [
-        { text: 'Registration Details', style: 'header' },
-        { text: '', margin: [0, 10, 0, 0] }
+        { text: "Registration Details", style: "header" },
+        { text: "", margin: [0, 10, 0, 0] },
     ];
 
-    Object.keys(groupedByTime).forEach(time => {
-        content.push({ text: `Departure Time: ${time}`, style: 'subheader' });
-        content.push({ text: '', margin: [0, 5, 0, 0] });
+    Object.keys(groupedByTime).forEach((time) => {
+        content.push({ text: `Departure Time: ${time}`, style: "subheader" });
+        content.push({ text: "", margin: [0, 5, 0, 0] });
 
-        const tableBody = [['BinusianID', 'Name', 'Phone', 'Email', 'Attendance']];
-        groupedByTime[time].forEach(item => {
+        const tableBody = [
+            ["BinusianID", "Name", "Phone", "Email", "Attendance"],
+        ];
+        groupedByTime[time].forEach((item) => {
             tableBody.push([
                 item.binusianID,
                 item.name,
                 item.phoneNumber,
                 item.email,
-                "   "
+                "   ",
             ]);
         });
 
         content.push({
-            style: 'tableExample',
+            style: "tableExample",
             table: {
-                body: tableBody
-            }
+                body: tableBody,
+            },
         });
 
-        content.push({ text: '', margin: [0, 10, 0, 0] }); // Space between tables
+        content.push({ text: "", margin: [0, 10, 0, 0] }); // Space between tables
     });
 
     const docDefinition = {
@@ -85,23 +87,31 @@ function generatePdf(data) {
         styles: {
             header: {
                 fontSize: 18,
-                bold: true
+                bold: true,
             },
             subheader: {
                 fontSize: 14,
                 bold: true,
-                margin: [0, 5, 0, 5]
+                margin: [0, 5, 0, 5],
             },
             tableExample: {
-                margin: [0, 5, 0, 15] 
-            }
+                margin: [0, 5, 0, 15],
+            },
         },
         layout: {
-            paddingLeft: function (i, node) { return 10; },
-            paddingRight: function (i, node) { return 10; },
-            paddingTop: function (i, node) { return 5; },
-            paddingBottom: function (i, node) { return 5; }
-        }
+            paddingLeft: function (i, node) {
+                return 10;
+            },
+            paddingRight: function (i, node) {
+                return 10;
+            },
+            paddingTop: function (i, node) {
+                return 5;
+            },
+            paddingBottom: function (i, node) {
+                return 5;
+            },
+        },
     };
 
     return printer.createPdfKitDocument(docDefinition);
@@ -115,28 +125,32 @@ router.get("/get-schedule-by-date", async (req, res) => {
         const details = await rf.findAll({
             where: {
                 useDate: {
-                    [Op.eq]: useDate
-                }
+                    [Op.eq]: useDate,
+                },
             },
-            include: [{
-                model: rfd,
-                as: 'details',
-                include: [{
-                    model: Shuttleschedule,
-                    as: 'schedulesDetails',
-                    where: {
-                        departingLocation: {
-                            [Op.eq]: departingLocation
-                        }
-                    },
-                    attributes: ['scheduleID', 'departureTime']
-                }]
-            }]
+            include: [
+                {
+                    model: rfd,
+                    as: "details",
+                    include: [
+                        {
+                            model: Shuttleschedule,
+                            as: "schedulesDetails",
+                            where: {
+                                departingLocation: {
+                                    [Op.eq]: departingLocation,
+                                },
+                            },
+                            attributes: ["scheduleID", "departureTime"],
+                        },
+                    ],
+                },
+            ],
         });
 
         // Generate PDF
         const pdfDoc = generatePdf(details);
-        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader("Content-Type", "application/pdf");
         pdfDoc.pipe(res);
         pdfDoc.end();
     } catch (err) {
@@ -144,9 +158,37 @@ router.get("/get-schedule-by-date", async (req, res) => {
     }
 });
 
-
-//GET : Get Registration Datas by Schedule
+//GET : Get Verified Registration Datas by Schedule
 router.get("/schedule", async (req, res) => {
+    try {
+        const scheduleID = parseInt(req.query.scheduleID, 10);
+        const useDate = req.query.useDate;
+        const details = await rfd.findAll({
+            where: {
+                scheduleID: scheduleID,
+            },
+            include: [
+                {
+                    model: rf,
+                    where: {
+                        useDate: {
+                            [Op.eq]: useDate,
+                        },
+                        verification_status: "Verified",
+                    },
+                },
+            ],
+        });
+        return res.status(200).json(details);
+    } catch (err) {
+        return res
+            .status(500)
+            .json({ message: "Server error", error: err.message });
+    }
+});
+
+//GET : Get All Registration Datas by Schedule
+router.get("/all-schedule", async (req, res) => {
     try {
         const scheduleID = parseInt(req.query.scheduleID, 10);
         const useDate = req.query.useDate;
@@ -312,10 +354,11 @@ const addRegistration = async (reqBody) => {
         email,
         purpose,
         useDate,
-        status,
+        verification_status,
+        attendance_status,
         scheduleID,
         scheduleID2,
-        otp
+        otp,
     } = reqBody;
 
     const registration = await rf.create({
@@ -325,8 +368,9 @@ const addRegistration = async (reqBody) => {
         email,
         purpose,
         useDate,
-        status,
-        otp
+        verification_status,
+        attendance_status,
+        otp,
     });
     const newRegistrationID = registration.RegistrationID;
 
@@ -366,8 +410,8 @@ router.get("/getOtp", authenticateToken, async (req, res) => {
         } else {
             res.status(404).json({ error: "Registration not found" });
         }
-    } catch(error) {
-        res.status(500).json({ error : error.message });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -378,7 +422,7 @@ router.get("/verify-otp", async (req, res) => {
 
         if (registration) {
             if (registration.otp === otp) {
-                registration.verification_status = 'Verified'; 
+                registration.verification_status = "Verified";
                 await registration.save();
                 res.json({ message: "OTP verified successfully." });
             } else {
@@ -387,7 +431,7 @@ router.get("/verify-otp", async (req, res) => {
         } else {
             res.status(404).json({ error: "Registration not found." });
         }
-    } catch(error) {
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });

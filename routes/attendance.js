@@ -53,6 +53,7 @@ router.get("/get", async (req, res) => {
         const registrations = await rf.findAll({
             where: {
                 useDate: useDate,
+                verification_status: "Verified",
             },
             include: [
                 {
