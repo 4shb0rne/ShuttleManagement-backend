@@ -13,12 +13,14 @@ module.exports = (sequelize, DataTypes) => {
     }
     User.init(
         {
-            binusian_id: {
-                type: DataTypes.STRING,
+            user_id: {
+                type: DataTypes.INTEGER,
                 primaryKey: true,
+                autoIncrement: true
             },
             username: DataTypes.STRING,
             password: DataTypes.STRING,
+            user_role: DataTypes.STRING
         },
         {
             sequelize,

@@ -346,7 +346,7 @@ router.put("/processRequest", async (req, res) => {
     }
 });
 
-const addRegistration = async (reqBody) => {
+const addRegistration2Way = async (reqBody) => {
     const {
         binusianID,
         name,
@@ -389,13 +389,64 @@ const addRegistration = async (reqBody) => {
     };
 };
 
-//ADD : Add Registration
+const addRegistration1Way = async (reqBody) => {
+    const {
+        binusianID,
+        name,
+        phoneNumber,
+        email,
+        purpose,
+        useDate,
+        verification_status,
+        attendance_status,
+        scheduleID,
+        otp,
+    } = reqBody;
+
+    const registration = await rf.create({
+        binusianID,
+        name,
+        phoneNumber,
+        email,
+        purpose,
+        useDate,
+        verification_status,
+        attendance_status,
+        otp,
+    });
+    const newRegistrationID = registration.RegistrationID;
+
+    await rfd.create({
+        scheduleID,
+        registrationID: newRegistrationID,
+    });
+
+    return {
+        registration,
+        message: `New registration created with ID: ${newRegistrationID}`,
+    };
+};
+
+
+router.post("/add-1-way", async (req, res) => {
+    const otp = generateOTP();
+    try {
+        const newRegistrationData = { ...req.body, otp: otp };
+        const result = await addRegistration1Way(newRegistrationData);
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+//ADD : Add Registration 2 Way
 router.post("/add", async (req, res) => {
     const otp = generateOTP();
     try {
         const newRegistrationData = { ...req.body, otp: otp };
         console.log(newRegistrationData);
-        const result = await addRegistration(newRegistrationData);
+        const result = await addRegistration2Way(newRegistrationData);
         res.status(201).json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });

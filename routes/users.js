@@ -5,21 +5,6 @@ const bcrypt = require("bcryptjs");
 const { User } = require("../models");
 
 
-router.post("/register", async (req, res) => {
-    const { username, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    try {
-        const newUser = await User.create({
-            username,
-            password: hashedPassword,
-        });
-
-        res.status(201).json(newUser);
-    } catch (error) {
-        res.status(500).json(error);
-    }
-});
-
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
 

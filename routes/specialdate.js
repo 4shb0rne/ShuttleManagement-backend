@@ -13,7 +13,7 @@ router.post('/add', async (req, res) => {
         // Check if a SpecialDate with the same date already exists
         const existingSpecialDate = await SpecialDate.findOne({ where: { date } });
         if (existingSpecialDate) {
-            return res.status(409).send({ message: "A record with the same date already exists" });
+            return res.status(200).send({ message: "A record with the same date already exists" });
         }
 
         // If not, create a new SpecialDate

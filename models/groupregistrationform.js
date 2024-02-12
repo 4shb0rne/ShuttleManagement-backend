@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'GroupRegistrationForm',
     tableName: 'GroupRegistrationForms',
-    timestamps: true, // This ensures createdAt and updatedAt fields are used
+    timestamps: true,
   });
   return GroupRegistrationForm;
 };

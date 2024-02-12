@@ -13,28 +13,11 @@ router.post('/add', async (req, res) => {
         email,
         purpose,
         useDate,
-        status,
         scheduleID,
         scheduleID2,
     } = req.body;
 
     try {
-        // const ids = await Promise.all(forms.map(async form => {
-        //     const { binusianID, name } = form;
-        //     const data = {
-        //         binusianID,
-        //         name,
-        //         phoneNumber,
-        //         email,
-        //         purpose,
-        //         useDate,
-        //         status,
-        //         scheduleID,
-        //         scheduleID2
-        //     };
-        //     const reg = await registrationform.addRegistration(data);
-        //     return reg.registration.dataValues.RegistrationID;
-        // }));
         const groupRegistration = await grf.create({
             email: email,
             phoneNumber: phoneNumber,
