@@ -9,6 +9,7 @@ const authenticateToken = require("../middleware/authJWT");
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 const PdfPrinter = require("pdfmake");
+const XLSX = require("xlsx");
 
 var fonts = {
     Roboto: {
@@ -117,6 +118,82 @@ function generatePdf(data) {
     return printer.createPdfKitDocument(docDefinition);
 }
 
+function generateXlsx(data) {
+    const workbook = XLSX.utils.book_new();
+
+    // Group data by location
+    const groupedByLocation = {};
+    data.forEach((item) => {
+        item.details.forEach((detail) => {
+            const schedule = detail.schedulesDetails;
+            const location = schedule.departingLocation;
+            const time = schedule.departureTime;
+            if (!groupedByLocation[location]) {
+                groupedByLocation[location] = [];
+            }
+            groupedByLocation[location].push({
+                binusianID: item.binusianID,
+                name: item.name,
+                phoneNumber: item.phoneNumber,
+                email: item.email,
+                departureTime: time, // Include the departure time
+                attendance_status: item.attendance_status,
+            });
+        });
+    });
+
+    // Iterate over each location
+    Object.keys(groupedByLocation).forEach((location) => {
+        // Create a worksheet for each location
+        const worksheetName = `${location} Schedule`;
+        const worksheet = XLSX.utils.aoa_to_sheet([]);
+
+        const headers = [
+            "BinusianID",
+            "Name",
+            "Phone",
+            "Email",
+            "Departure Time",
+            "Attendance",
+        ];
+
+        XLSX.utils.sheet_add_aoa(worksheet, [headers], { origin: "A1" });
+
+        // Add data
+        const tableData = groupedByLocation[location].map((item) => [
+            item.binusianID,
+            item.name,
+            item.phoneNumber,
+            item.email,
+            item.departureTime,
+            item.attendance_status,
+        ]);
+        XLSX.utils.sheet_add_aoa(worksheet, tableData, { origin: "A2" });
+
+        // Set column widths
+        const columnWidths = [
+            { wpx: 100 }, // Width in pixels for the first column (BinusianID)
+            { wpx: 150 }, // Width in pixels for the second column (Name)
+            { wpx: 100 }, // Width in pixels for the third column (Phone)
+            { wpx: 200 }, // Width in pixels for the fourth column (Email)
+            { wpx: 150 }, // Width in pixels for the fifth column (Departure Time)
+            { wpx: 100 }, // Width in pixels for the sixth column (Attendance)
+        ];
+        worksheet["!cols"] = columnWidths;
+
+        // Add autofilters to headers
+        worksheet["!autofilter"] = { ref: `A1:F${tableData.length + 1}` };
+
+        // Append the worksheet to the workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName);
+    });
+
+    // Generate buffer
+    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+    return buffer;
+}
+
 //GET : Based on Date + Departing Location
 router.get("/get-schedule-by-date", async (req, res) => {
     try {
@@ -154,6 +231,54 @@ router.get("/get-schedule-by-date", async (req, res) => {
         pdfDoc.pipe(res);
         pdfDoc.end();
     } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+});
+
+//GET : Get attendance excel file
+router.get("/get-attendance-excel", async (req, res) => {
+    try {
+        const useDate = req.query.useDate;
+        const details = await rf.findAll({
+            where: {
+                useDate: useDate, // Use directly without [Op.eq]
+            },
+            include: [
+                {
+                    model: rfd,
+                    as: "details",
+                    include: [
+                        {
+                            model: Shuttleschedule,
+                            as: "schedulesDetails",
+                            attributes: [
+                                "scheduleID",
+                                "departureTime",
+                                "departingLocation",
+                            ],
+                        },
+                    ],
+                },
+            ],
+        });
+        console.log("Testing");
+        // Generate Excel
+        const buffer = generateXlsx(details);
+
+        // Set response headers
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="attendance.xlsx"`
+        );
+
+        // Send the buffer as response
+        res.send(buffer);
+    } catch (err) {
+        console.error("Error generating Excel:", err);
         res.status(500).json({ message: "Server error", error: err.message });
     }
 });
@@ -427,7 +552,6 @@ const addRegistration1Way = async (reqBody) => {
     };
 };
 
-
 router.post("/add-1-way", async (req, res) => {
     const otp = generateOTP();
     try {
@@ -438,7 +562,6 @@ router.post("/add-1-way", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 //ADD : Add Registration 2 Way
 router.post("/add", async (req, res) => {
@@ -530,4 +653,5 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-module.exports = { router, addRegistration };
+module.exports = { router, addRegistration1Way };
+module.exports = { router, addRegistration2Way };
