@@ -41,6 +41,36 @@ router.post('/add', async (req, res) => {
     }
 });
 
+router.post("/add-1-way", async (req, res) => {
+    const {
+        forms,
+        phoneNumber,
+        email,
+        purpose,
+        useDate,
+        scheduleID
+    } = req.body;
+
+    try {
+        const groupRegistration = await grf.create({
+            email: email,
+            phoneNumber: phoneNumber,
+            purpose: purpose,
+            forms: forms,
+            useDate,
+            status: "Not Verified"
+        });
+        const groupRegID = groupRegistration.dataValues.groupRegistrationID;
+        await grfd.create({
+            scheduleID,
+            groupRegistrationID: groupRegID,
+        });
+        res.status(201).json(groupRegistration.dataValues);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 // READ: Get a group registration by ID
 router.get('/:id', async (req, res) => {
