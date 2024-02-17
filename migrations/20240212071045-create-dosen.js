@@ -4,27 +4,23 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.createTable('Dosen', {
-      binusianID: {
+      id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       kodeDosen: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      emails: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-        get() {
-          const value = this.getDataValue('emails');
-          return value ? JSON.parse(value) : null;
-        },
-        set(val) {
-          this.setDataValue('emails', JSON.stringify(val));
-        }
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       namaDosen: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
       }
     });
   },

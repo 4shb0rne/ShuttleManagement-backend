@@ -14,6 +14,8 @@ var groupRF = require("./routes/groupRF");
 var email = require('./routes/email');
 var attendance = require('./routes/attendance');
 var specialdate = require('./routes/specialdate');
+var dosen = require('./routes/dosen');
+
 
 var app = express();
 
@@ -37,6 +39,7 @@ app.use("/group-registration", groupRF);
 app.use("/email", email);
 app.use("/attendance", attendance);
 app.use("/specialdate", specialdate);
+app.use("/dosen", dosen);
 
 
 // catch 404 and forward to error handler

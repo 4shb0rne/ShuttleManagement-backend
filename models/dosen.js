@@ -11,23 +11,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   Dosen.init(
     {
-      binusianID: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      id: {
+        type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       kodeDosen: DataTypes.STRING,
-      emails: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-        get() {
-          const value = this.getDataValue("emails");
-          return value ? JSON.parse(value) : [];
-        },
-        set(val) {
-          this.setDataValue("emails", JSON.stringify(val));
-        },
-      },
+      email: DataTypes.STRING,
       namaDosen: DataTypes.STRING,
     },
     {

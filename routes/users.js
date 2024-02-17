@@ -25,7 +25,6 @@ router.post("/login", async (req, res) => {
 
 router.get("/get-current-user", authenticateToken, async (req, res) => {
     try {
-        console.log(req.user.username);
         const userData = await User.findOne({
             where: { username: req.user.username },
         });
@@ -58,8 +57,7 @@ router.get("/get-all-users", async (req, res) => {
 router.put("/update-access-rights", async (req, res) => {
     const user_id = req.query.user_id;
     const { access_rights } = req.body;
-    console.log(access_rights);
-    // console.log(JSON.parse(access_rights));
+   
     try {
         const user = await User.findOne({
             where: { user_id: user_id },
@@ -102,6 +100,21 @@ router.delete("/:user_id", async (req, res) => {
             res.status(404).json({ error: "User not found" });
         }
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post("/add", async (req, res) => {
+    const { username, password, access_rights } = req.body;
+    try {   
+        await User.create({
+            username,
+            password,
+            user_role: "Admin",
+            access_rights
+        });
+        res.status(201).send("New user successfully created");
+    } catch (error) { 
         res.status(500).json({ error: error.message });
     }
 });
