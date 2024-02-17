@@ -13,7 +13,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const jsonData = xlsx.utils.sheet_to_json(worksheet, { raw: false });
 
     for (const data of jsonData) {
-      await Dosen.create({
+      await ds.create({
         kodeDosen: data['Lecturer ID'],
         email: data['Email'],
         namaDosen: data['Official Name']
@@ -26,5 +26,33 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+router.get("/get", async (req, res) => {
+  try {
+    const dosens = ds.findAll();
+    res.status(200).json(dosens);
+  } catch (error) {
+    res.status(500).send({"error" : error});
+  }
+});
+
+
+router.get("/check", async (req, res) => {
+  const { kodeDosen, email } = req.query;
+  try{  
+    const dosen = await ds.findOne({
+      where: { kodeDosen : kodeDosen, email: email }
+    });
+    
+    if(dosen) {
+      res.status(200).json(dosen);
+    } else {  
+      res.status(200).json({
+        message: "Invalid Data"
+      });
+    }
+  } catch (error) {
+    res.status(500).send({"error" : error});
+  }
+});
 
 module.exports = router;
