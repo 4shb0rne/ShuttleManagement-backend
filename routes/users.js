@@ -59,7 +59,6 @@ router.put("/update-access-rights", async (req, res) => {
     const user_id = req.query.user_id;
     const { access_rights } = req.body;
 
-    console.log(access_rights);
     try {
         const user = await User.findOne({
             where: { user_id: user_id },
@@ -76,7 +75,7 @@ router.put("/update-access-rights", async (req, res) => {
                 .json({ message: "Access rights must be an array" });
         }
 
-        user.access_rights = access_rights;
+        user.access_rights = JSON.stringify(access_rights);
         await user.save();
 
         return res
