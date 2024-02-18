@@ -596,19 +596,87 @@ router.get("/verify-otp", async (req, res) => {
 
         if (registration) {
             if (registration.otp === otp) {
-                registration.verification_status = "Verified";
-                await registration.save();
-                res.json({ message: "OTP verified successfully." });
+                if(validateCapacity(registrationID)) {
+                    registration.verification_status = "Verified";
+                    await registration.save();
+                    res.json({ message: "OTP verified successfully" });
+                } else {
+                    res.json({ message : "Full Capacity" });
+                }
             } else {
-                res.status(400).json({ error: "Invalid OTP." });
+                res.json({ message : "Invalid OTP" });
             }
         } else {
-            res.status(404).json({ error: "Registration not found." });
+            res.json({ error: "Registration not found" });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+router.get("/validate-capacity", async (req, res) => {
+    try {
+        const { registrationID } = req.query;
+        const check = await validateCapacity(registrationID);
+        res.status(200).json({ available: check });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
+const validateCapacity = async(registrationID) => {
+    try {
+      if (!registrationID) {
+        return res.status(400).json({ error: 'registrationID query parameter is required.' });
+      }
+  
+      // Query the database for scheduleIDs and useDate associated with the provided registrationID
+      const registrationDetails = await rfd.findAll({
+        where: { registrationID },
+        attributes: ['scheduleID', 'registrationID'],
+        include: [{
+          model: rf,
+          attributes: ['useDate'],
+        }],
+        raw: true,
+      });
+  
+      if (registrationDetails.length === 0) {
+        return res.status(404).json({ message: 'No schedules found for the provided registrationID.' });
+      }
+      
+      // Fetch registrations count for each schedule on its useDate
+      const canRegisterPromises = registrationDetails.map(async (detail) => {
+        // Ensure we're accessing `useDate` correctly
+        const useDate = detail['RegistrationForm.useDate']; // Adjust this line if the path is incorrect
+        if (!useDate) {
+          console.error('useDate is undefined for detail:', detail);
+          return { scheduleID: detail.scheduleID, canRegister: false }; // Handle the undefined useDate case
+        }
+      
+        const count = await rfd.count({
+          include: [{
+            model: rf,
+            where: { useDate },
+            required: true
+          }],
+          where: { scheduleID: detail.scheduleID }
+        });
+        return { scheduleID: detail.scheduleID, canRegister: count < 25 };
+      });
+      
+  
+      const registrationCapacity = await Promise.all(canRegisterPromises);
+  
+      // Determine if any of the schedules allow for more registrations
+      const canRegister = registrationCapacity.some(capacity => capacity.canRegister);
+  
+      return canRegister;
+    } catch (error) {
+      console.error('Failed to check registration capacity:', error);
+      return false;
+    }
+};
 
 // DELETE: Delete a registration by ID
 router.delete("/:id", async (req, res) => {
