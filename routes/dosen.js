@@ -28,7 +28,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
 router.get("/get", async (req, res) => {
   try {
-    const dosens = ds.findAll();
+    const dosens = await ds.findAll();
     res.status(200).json(dosens);
   } catch (error) {
     res.status(500).send({"error" : error});
