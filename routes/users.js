@@ -104,12 +104,51 @@ router.delete("/:user_id", async (req, res) => {
     }
 });
 
+router.get("/:user_id", async (req, res) => {
+    const { user_id } = req.params.user_id;
+    try {
+        const user = await User.findOne({
+            where : { user_id }
+        })
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        } else {
+            return res.status(200).json(user);
+        }
+    } catch (error) {
+        res.status(500).json({ error : error.message });
+    }
+});
+
+router.put("/edit/:user_id", async (req, res) => {
+    const user_id = parseInt(req.params.user_id); // Corrected parameter extraction
+    try {
+        // Check if user exists
+        const user = await User.findByPk(user_id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        const { username, password, user_role, access_rights } = req.body;
+        await User.update(
+            { username, password, user_role, access_rights },
+            { where: { user_id } }
+        );
+
+        const updatedUser = await User.findByPk(user_id);
+        return res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 router.post("/add", async (req, res) => {
     const { username, password, access_rights } = req.body;
     try {   
+        const pass = bcrypt.hashSync(password, 10);
         await User.create({
             username,
-            password,
+            password: pass,
             user_role: "Admin",
             access_rights
         });
