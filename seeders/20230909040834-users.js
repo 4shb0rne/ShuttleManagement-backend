@@ -35,6 +35,7 @@ module.exports = {
                     "Schedules",
                     "Attendance",
                     "Manage Account",
+                    "Manage Dosen"
                 ]),
                 createdAt: new Date(),
                 updatedAt: new Date(),

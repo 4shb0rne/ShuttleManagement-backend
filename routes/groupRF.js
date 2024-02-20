@@ -5,6 +5,63 @@ var grfd = require('../models').GroupRegistrationFormDetail;
 var registrationform = require('./individualRF');
 var Shuttleschedule = require("../models").ShuttleSchedule;
 const authenticateToken = require('../middleware/authJWT');
+
+const validateCapacity = async(groupRegistrationID) => {
+    try {
+      if (!groupRegistrationID) {
+        return res.status(400).json({ error: 'registrationID query parameter is required.' });
+      }
+  
+      // Query the database for scheduleIDs and useDate associated with the provided registrationID
+      const registrationDetails = await grfd.findAll({
+        where: { groupRegistrationID },
+        attributes: ['scheduleID', 'groupRegistrationID'],
+        include: [{
+          model: grf,
+          attributes: ['useDate'],
+        }],
+        raw: true,
+      });
+  
+      if (registrationDetails.length === 0) {
+        return res.status(404).json({ message: 'No schedules found for the provided registrationID.' });
+      }
+      
+      // Fetch registrations count for each schedule on its useDate
+      const canRegisterPromises = registrationDetails.map(async (detail) => {
+        // Ensure we're accessing `useDate` correctly
+        const useDate = detail['GroupRegistrationForm.useDate']; // Adjust this line if the path is incorrect
+        if (!useDate) {
+          console.error('useDate is undefined for detail:', detail);
+          return { scheduleID: detail.scheduleID, canRegister: false }; // Handle the undefined useDate case
+        }
+      
+        const count = await grfd.count({
+          include: [{
+            model: grf,
+            where: { useDate },
+            required: true
+          }],
+          where: { scheduleID: detail.scheduleID }
+        });
+        return { scheduleID: detail.scheduleID, canRegister: count < 25 };
+      });
+      
+  
+      const registrationCapacity = await Promise.all(canRegisterPromises);
+  
+      // Determine if any of the schedules allow for more registrations
+      const canRegister = registrationCapacity.some(capacity => capacity.canRegister);
+  
+      return canRegister;
+    } catch (error) {
+      console.error('Failed to check registration capacity:', error);
+      return false;
+    }
+};
+
+
+
 // CREATE: Add a new group registration
 router.post('/add', async (req, res) => {
     const {
