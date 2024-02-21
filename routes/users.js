@@ -57,7 +57,7 @@ router.get("/get-all-users", async (req, res) => {
 router.put("/update-access-rights", async (req, res) => {
     const user_id = req.query.user_id;
     const { access_rights } = req.body;
-   
+
     try {
         const user = await User.findOne({
             where: { user_id: user_id },
@@ -108,8 +108,8 @@ router.get("/:user_id", async (req, res) => {
     const { user_id } = req.params.user_id;
     try {
         const user = await User.findOne({
-            where : { user_id }
-        })
+            where: { user_id },
+        });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -117,7 +117,7 @@ router.get("/:user_id", async (req, res) => {
             return res.status(200).json(user);
         }
     } catch (error) {
-        res.status(500).json({ error : error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -129,10 +129,11 @@ router.put("/edit/:user_id", async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        
+
         const { username, password, user_role, access_rights } = req.body;
+        const pass = bcrypt.hashSync(password, 10);
         await User.update(
-            { username, password, user_role, access_rights },
+            { username: username, password: pass, user_role, access_rights },
             { where: { user_id } }
         );
 
@@ -144,16 +145,16 @@ router.put("/edit/:user_id", async (req, res) => {
 });
 router.post("/add", async (req, res) => {
     const { username, password, access_rights } = req.body;
-    try {   
+    try {
         const pass = bcrypt.hashSync(password, 10);
         await User.create({
             username,
             password: pass,
             user_role: "Admin",
-            access_rights
+            access_rights,
         });
         res.status(201).send("New user successfully created");
-    } catch (error) { 
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
