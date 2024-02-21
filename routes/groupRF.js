@@ -2,64 +2,60 @@ var express = require('express');
 var router = express.Router();
 var grf = require('../models').GroupRegistrationForm;
 var grfd = require('../models').GroupRegistrationFormDetail;
+var rf = require("../models").RegistrationForm;
+var rfd = require("../models").RegistrationFormDetail;
 var registrationform = require('./individualRF');
 var Shuttleschedule = require("../models").ShuttleSchedule;
+const { User, Sequelize } = require("../models");
 const authenticateToken = require('../middleware/authJWT');
 
-const validateCapacity = async(groupRegistrationID) => {
+const validateCapacity = async(scheduleID, useDate, Capacity) => {
     try {
-      if (!groupRegistrationID) {
-        return res.status(400).json({ error: 'registrationID query parameter is required.' });
-      }
-  
-      // Query the database for scheduleIDs and useDate associated with the provided registrationID
-      const registrationDetails = await grfd.findAll({
-        where: { groupRegistrationID },
-        attributes: ['scheduleID', 'groupRegistrationID'],
-        include: [{
-          model: grf,
-          attributes: ['useDate'],
-        }],
-        raw: true,
-      });
-  
-      if (registrationDetails.length === 0) {
-        return res.status(404).json({ message: 'No schedules found for the provided registrationID.' });
-      }
-      
-      // Fetch registrations count for each schedule on its useDate
-      const canRegisterPromises = registrationDetails.map(async (detail) => {
-        // Ensure we're accessing `useDate` correctly
-        const useDate = detail['GroupRegistrationForm.useDate']; // Adjust this line if the path is incorrect
-        if (!useDate) {
-          console.error('useDate is undefined for detail:', detail);
-          return { scheduleID: detail.scheduleID, canRegister: false }; // Handle the undefined useDate case
-        }
-      
-        const count = await grfd.count({
-          include: [{
-            model: grf,
-            where: { useDate },
-            required: true
-          }],
-          where: { scheduleID: detail.scheduleID }
+        // 1. Get the ShuttleSchedule and the count of related registrations
+        const schedule = await Shuttleschedule.findByPk(scheduleID, {
+          include: {
+            model: rfd,
+            as: "schedulesDetails", 
+            required: true, // Ensure only schedules with registrations are considered
+            include: {
+              model: rf, // Include the parent RegistrationForm
+              where: {
+                useDate: useDate, 
+              },
+            },
+          },
+          attributes: { 
+            include: [[Sequelize.fn('COUNT', Sequelize.col('schedulesDetails.registrationID')), 'registrationCount']] 
+          },
         });
-        return { scheduleID: detail.scheduleID, canRegister: count < 25 };
-      });
-      
-  
-      const registrationCapacity = await Promise.all(canRegisterPromises);
-  
-      // Determine if any of the schedules allow for more registrations
-      const canRegister = registrationCapacity.some(capacity => capacity.canRegister);
-  
-      return canRegister;
-    } catch (error) {
-      console.error('Failed to check registration capacity:', error);
-      return false;
-    }
+        
+        // 2. Check if registration count exceeds capacity
+        if (schedule && schedule.getDataValue('registrationCount') + Capacity > 25) {
+          return {
+            schedule,
+            status: false
+          };
+        }
+    
+        return {
+            schedule,
+            status: true
+        };
+      } catch (error) {
+        console.error("Error in validateCapacity:", error);
+        throw error; 
+      }
 };
 
+router.get("/validate", async (req, res) => {
+    const { scheduleID, useDate, Capacity} = req.query;
+    try {
+        const result = await validateCapacity(scheduleID, useDate, Capacity);
+        res.status(200).json(result);   
+    } catch(error) {
+        res.status(500).json({error : error.message});
+    }
+});
 
 
 // CREATE: Add a new group registration
