@@ -104,4 +104,63 @@ router.delete("/delete/:id", async (req, res) => {
     }
 });
 
+router.get("/get-excel", async (req, res) => {
+    try {
+        const dosens = await ds.findAll();
+
+        // Extract only the actual data values
+        const dosensData = dosens.map(dosen => dosen.dataValues);
+
+        // Map database headers to Excel headers
+        const headerMapping = {
+            kodeDosen: "Lecturer ID",
+            namaDosen: "Official Name",
+            email: "Email"
+            // Add other mappings as needed
+        };
+
+        // Set headers
+        const headers = [
+            "ID",
+            "Lecturer ID", // Mapped from kodeDosen
+            "Official Name", // Mapped from namaDosen
+            "Email",
+        ];
+
+        // Map dosensData properties to match the Excel headers
+        const wsData = [headers, ...dosensData.map(dosen => [
+            dosen.id,
+            dosen.kodeDosen,
+            dosen.namaDosen,
+            dosen.email,
+        ])];
+
+        const ws = xlsx.utils.aoa_to_sheet(wsData);
+
+        const wb = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(wb, ws, 'Dosens');
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=dosens.xlsx');
+
+        const columnWidths = [
+            { wpx: 100 },
+            { wpx: 150 },
+            { wpx: 200 },
+            { wpx: 350 },
+        ];
+        ws["!cols"] = columnWidths;
+        const excelBuffer = xlsx.write(wb, { bookType: 'xlsx', type: 'buffer' });
+        res.send(excelBuffer);
+
+    } catch (error) {
+        console.error("Error generating Excel:", error);
+        res.status(500).send({ error: 'Error generating Excel file', details: error.message });
+    }
+});
+
+
+
+
+
 module.exports = router;
