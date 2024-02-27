@@ -556,8 +556,13 @@ router.post("/add-1-way", async (req, res) => {
     const otp = generateOTP();
     try {
         const newRegistrationData = { ...req.body, otp: otp };
-        const result = await addRegistration1Way(newRegistrationData);
-        res.status(201).json(result);
+        const check = await validateCapacityBasedOnSchedule(req.body.useDate, req.body.scheduleID);
+        if(req.body.verification_status == "Verified" && !check){
+            res.status(200).json({message : "Full Capacity"});
+        } else {
+            const result = await addRegistration1Way(newRegistrationData);
+            res.status(201).json(result);
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -569,8 +574,16 @@ router.post("/add", async (req, res) => {
     try {
         const newRegistrationData = { ...req.body, otp: otp };
         console.log(newRegistrationData);
-        const result = await addRegistration2Way(newRegistrationData);
-        res.status(201).json(result);
+        const check1 = await validateCapacityBasedOnSchedule(req.body.useDate, req.body.scheduleID);
+        const check2 = await validateCapacityBasedOnSchedule(req.body.useDate, req.body.scheduleID2);
+        console.log(check1);
+        console.log(check2);
+        if(req.body.verification_status == "Verified" && (check1 && check2)){
+            res.status(200).json({message : "Full Capacity"});
+        } else {
+            const result = await addRegistration2Way(newRegistrationData);
+            res.status(201).json(result);
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -596,7 +609,8 @@ router.get("/verify-otp", async (req, res) => {
 
         if (registration) {
             if (registration.otp === otp) {
-                if(validateCapacity(registrationID)) {
+                const check = await validateCapacity(registrationID);
+                if(check) {
                     registration.verification_status = "Verified";
                     await registration.save();
                     res.json({ message: "OTP verified successfully" });
@@ -677,6 +691,29 @@ const validateCapacity = async(registrationID) => {
       return false;
     }
 };
+
+const validateCapacityBasedOnSchedule = async (useDate, scheduleID) => {
+    try {
+        if (!useDate || !scheduleID) {
+            return false;
+        }
+
+        const count = await rfd.count({
+            include: [{
+                model: rf,
+                where: { useDate },
+                required: true
+            }],
+            where: { scheduleID }
+        });
+
+        return count >= 25; 
+    } catch (error) {
+        console.error('Failed to check registration capacity:', error);
+        return false;
+    }
+};
+  
 
 // DELETE: Delete a registration by ID
 router.delete("/:id", async (req, res) => {
