@@ -2,8 +2,8 @@ var express = require("express");
 var router = express.Router();
 var SpecialDate = require("../models").SpecialDate;
 var Shuttleschedule = require("../models").ShuttleSchedule;
-
-router.post('/add', async (req, res) => {
+const authenticateToken = require("../middleware/authJWT");
+router.post('/add', authenticateToken, async (req, res) => {
     try {
         const { date, reason } = req.body;
         if (!date || !reason) {

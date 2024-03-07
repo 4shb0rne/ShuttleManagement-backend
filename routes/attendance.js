@@ -3,9 +3,9 @@ var router = express.Router();
 var rf = require("../models").RegistrationForm;
 var rfd = require("../models").RegistrationFormDetail;
 var Shuttleschedule = require("../models").ShuttleSchedule;
-
+const authenticateToken = require("../middleware/authJWT");
 // UPDATE: Change status to Present
-router.put("/attend", async (req, res) => {
+router.put("/attend", authenticateToken, async (req, res) => {
     const registrationId = req.query.id;
 
     if (!registrationId) {
@@ -46,7 +46,7 @@ router.put("/attend", async (req, res) => {
 });
 
 //get attendees data schedules
-router.get("/get", async (req, res) => {
+router.get("/get", authenticateToken, async (req, res) => {
     try {
         const scheduleID = req.query.scheduleID;
         const useDate = new Date(req.query.useDate);

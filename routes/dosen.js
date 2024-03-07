@@ -3,7 +3,7 @@ var router = express.Router();
 var ds = require("../models").Dosen;
 const multer = require("multer");
 const xlsx = require("xlsx");
-
+const authenticateToken = require("../middleware/authJWT");
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/upload", upload.single("file"), async (req, res) => {
@@ -27,7 +27,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     }
 });
 
-router.get("/get", async (req, res) => {
+router.get("/get", authenticateToken, async (req, res) => {
     try {
         const dosens = await ds.findAll();
         res.status(200).json(dosens);
@@ -36,7 +36,7 @@ router.get("/get", async (req, res) => {
     }
 });
 
-router.get("/check", async (req, res) => {
+router.get("/check", authenticateToken, async (req, res) => {
     const { kodeDosen, email } = req.query;
     try {
         const dosen = await ds.findOne({
@@ -55,7 +55,7 @@ router.get("/check", async (req, res) => {
     }
 });
 
-router.post("/add", async (req, res) => {
+router.post("/add", authenticateToken, async (req, res) => {
     const { kodeDosen, email, namaDosen } = req.body;
     try {
         const dosen = await ds.create({
@@ -70,7 +70,7 @@ router.post("/add", async (req, res) => {
     }
 });
 
-router.put("/edit/:id", async (req, res) => {
+router.put("/edit/:id", authenticateToken, async (req, res) => {
     const id = parseInt(req.params.id); // Corrected parameter extraction
     try {
         // Check if user exists
@@ -89,7 +89,7 @@ router.put("/edit/:id", async (req, res) => {
     }
 });
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", authenticateToken, async (req, res) => {
     try {
         const deleted = await ds.destroy({
             where: { id: req.params.id },
